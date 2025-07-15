@@ -87,5 +87,6 @@ void render(const std::vector<std::vector<int>>& GameMap) {
 			SDL_RenderTexture(renderer, cellTexture, nullptr, &RenderRects[j][i]);
 		}
 	}
+	render3D();
 	SDL_RenderPresent(renderer);
 }
