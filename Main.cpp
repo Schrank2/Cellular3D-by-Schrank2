@@ -22,19 +22,7 @@ SDL_Window* window;
 SDL_Renderer* renderer;
 vector<vector<int>> GameMap;
 vector<vector<int>> GameMapNext;
-vector<thread> ThreadList;
 // using pointers because weird
-void executeThreaded(std::function<void(int)> func) {
-	int rowLength = GameHeight / ThreadCountUsed;
-	for (int i = 0; i < ThreadCountUsed; i++) {
-		int yMin = i * rowLength;
-		int yMax = (i == ThreadCountUsed - 1) ? GameHeight : (i + 1) * rowLength; // the last thread takes the remaining rows
-		ThreadList.emplace_back(func, i, GameMap, 0, GameWidth, yMin, yMax);
-	}
-	for (auto& th : ThreadList) { th.join(); }; // Wait for the Rectangles to be calculated
-}
-
-
 int main(int argc, char* argv[])
 {
 	// Declaring Globals based on the settings
