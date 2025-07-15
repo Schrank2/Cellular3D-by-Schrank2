@@ -1,0 +1,13 @@
+# The density of Cells in the beginning in 0.0 -> 1.0
+mapDensity=0.7
+# ScreenWidth and ScreenHeight must both be divisible by GameScale without a remainder, or parts of the Screen will remain empty.
+# The Dimensions of each tile in pixels
+GameScale=16
+# The width of the game window in pixels
+ScreenWidth=1600 
+# The height of the game window in pixels
+ScreenHeight=900
+# The percentage of CPU threads to use for the game
+ThreadCountUsage=0.5
+# Time between game ticks in milliseconds
+TickTime=150 
