@@ -13,6 +13,19 @@ struct Voxel {
 	// Defining Constructor
 	Voxel(float x, float y, float z, std::vector<int> Color) : x(x), y(y), z(z), Color(Color) {}
 };
+struct Point {
+	// Defining Components
+	float x, y;
+	// Defining Constructor
+	Point(float x, float y) : x(x), y(y) {}
+};
+struct Triangle {
+	// Defining Components
+	Point p1, p2, p3;
+	std::vector<int> Color;
+	// Defining Constructor
+	Triangle(Point p1, Point p2, Point p3, std::vector<int> Color) : p1(p1), p2(p2), p3(p3), Color(Color) {}
+};
 // Adding all Voxels to a list.
 std::vector<Voxel> VoxelQueue;
 void readVoxels(const std::vector<std::vector<int>>& GameMap) {
@@ -27,7 +40,15 @@ void readVoxels(const std::vector<std::vector<int>>& GameMap) {
 		}
 	}
 }
-void renderVoxel() {};
+int ScreenCoordinateX(int x, int z) {
+	return ScreenWidth * x / z + ScreenWidth / 2;
+}
+int ScreenCoordinateY(int y, int z) {
+	return -ScreenHeight * y / z + ScreenHeight / 2;
+}
+void renderVoxel(Voxel V) {
+	cout << "Render Voxel";
+};
 void render3D() {
 	readVoxels(GameMap);
 	for (int i = 0; i < VoxelQueue.size(); i++) {
