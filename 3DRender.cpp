@@ -5,27 +5,41 @@ using namespace std;
 #include "functions.h"
 #include <vector>
 #include <string>
+
 // Declaring the "Data Type" Voxel
-struct Voxel {
+struct RGBA {
 	// Defining Components
-	float x, y, z;
-	std::vector<int> Color;
+	int r, g, b, a;
 	// Defining Constructor
-	Voxel(float x, float y, float z, std::vector<int> Color) : x(x), y(y), z(z), Color(Color) {}
-};
-struct Point {
+	RGBA(int r, int g, int b, int a) : r(r), g(g), b(b), a(a) {}
+};;
+struct POS {
 	// Defining Components
 	float x, y;
 	// Defining Constructor
-	Point(float x, float y) : x(x), y(y) {}
+	POS(float x, float y) : x(x), y(y) {}
+};
+struct POS3D {
+	// Defining Components
+	float x, y, z;
+	// Defining Constructor
+	POS3D(float x, float y, float z) : x(x), y(y), z(z) {}
 };
 struct Triangle {
 	// Defining Components
-	Point p1, p2, p3;
-	std::vector<int> Color;
+	POS p1, p2, p3;
+	RGBA Color;
 	// Defining Constructor
-	Triangle(Point p1, Point p2, Point p3, std::vector<int> Color) : p1(p1), p2(p2), p3(p3), Color(Color) {}
+	Triangle(POS p1, POS p2, POS p3, RGBA Color) : p1(p1), p2(p2), p3(p3), Color(Color) {}
 };
+struct Voxel {
+	// Defining Components
+	POS3D Position;
+	RGBA Color;
+	// Defining Constructor
+	Voxel(POS3D Position, RGBA Color) : Position(Position), Color(Color) {}
+};
+
 // Adding all Voxels to a list.
 std::vector<Voxel> VoxelQueue;
 void readVoxels(const std::vector<std::vector<int>>& GameMap) {
@@ -34,7 +48,9 @@ void readVoxels(const std::vector<std::vector<int>>& GameMap) {
 	for (int i = 0; i < GameWidth; i++) {
 		for (int j = 0; j < GameHeight; j++) {
 			if (GameMap[i][j] == 1) {
-				Voxel v=Voxel(i, j, 0, { 0, 255, 0, 0 });
+				RGBA color(0, 255, 0, 255);
+				POS3D pos(i, j, 3);
+				Voxel v=Voxel(pos, color);
 				VoxelQueue.emplace_back(v);
 			}
 		}
@@ -47,7 +63,8 @@ int ScreenCoordinateY(int y, int z) {
 	return -ScreenHeight * y / z + ScreenHeight / 2;
 }
 void renderVoxel(Voxel V) {
-	cout << "Render Voxel";
+	cout << "Rendering Voxel at (" << V.Position.x << ", " << V.Position.y << ", " << V.Position.z << ") with color ("
+		<< V.Color.r << ", " << V.Color.g << ", " << V.Color.b << ", " << V.Color.a << ")" << endl;
 };
 void render3D() {
 	readVoxels(GameMap);

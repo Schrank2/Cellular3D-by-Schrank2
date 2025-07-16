@@ -19,8 +19,6 @@ extern SDL_Event event;
 extern SDL_Texture* cellTexture;
 extern std::vector<std::vector<int>> GameMap;
 extern std::vector<std::vector<int>> GameMapNext;
-extern struct Voxel;
-extern std::vector<Voxel> VoxelQueue;
 // Settings
 extern int GameScale; // The Dimensions of each tile in pixels
 extern float mapDensity; // The density of Cells in the beginning in 0.0 -> 1.0
