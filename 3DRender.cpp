@@ -58,17 +58,23 @@ void renderVoxel(Voxel V) {
 	//cout << "Rendering Voxel at (" << V.position.x << ", " << V.position.y << ", " << V.position.z << ") with color (" << V.color.r << ", " << V.color.g << ", " << V.color.b << ", " << V.color.a << ")" << endl;
 	vector<Triangle> Triangles;
 	// Front Face
-	Triangles.emplace_back(Triangle { {0,0,0},{ 0,1,0 },{1,1,0},{0.0f,0.5f,0.0f,1.0f}});
-	Triangles.emplace_back(Triangle{ {0,0,0},{ 1,0,0 },{1,1,0},{0.0f,0.5f,0.0f,1.0f} });
+	Triangles.emplace_back(Triangle{ {0,0,0},{0,1,0},{1,1,0},{0.0f,0.5f,0.0f,1.0f}});
+	Triangles.emplace_back(Triangle{ {0,0,0},{1,0,0},{1,1,0},{0.0f,0.5f,0.0f,1.0f}});
 	// Back Face
-	Triangles.emplace_back(Triangle{ {0,0,1},{ 0,1,1 },{1,1,1},{0.0f,0.4f,0.0f,1.0f} });
-	Triangles.emplace_back(Triangle{ {0,0,1},{ 1,0,1 },{1,1,1},{0.0f,0.4f,0.0f,1.0f} });
+	Triangles.emplace_back(Triangle{ {0,0,1},{0,1,1},{1,1,1},{0.0f,0.4f,0.0f,1.0f}});
+	Triangles.emplace_back(Triangle{ {0,0,1},{1,0,1},{1,1,1},{0.0f,0.4f,0.0f,1.0f}});
 	// Bottom Face
-	Triangles.emplace_back(Triangle{ {0,0,0},{ 1,0,0 },{1,0,1},{0.0f,0.45f,0.0f,1.0f} });
-	Triangles.emplace_back(Triangle{ {0,0,0},{ 0,0,1 },{1,0,1},{0.0f,0.45f,0.0f,1.0f} });
+	Triangles.emplace_back(Triangle{ {0,0,0},{1,0,0},{1,0,1},{0.0f,0.45f,0.0f,1.0f}});
+	Triangles.emplace_back(Triangle{ {0,0,0},{0,0,1},{1,0,1},{0.0f,0.45f,0.0f,1.0f}});
 	// Top Face
-	Triangles.emplace_back(Triangle{ {0,1,0},{ 1,1,0 },{1,1,1},{0.0f,0.45f,0.0f,1.0f} });
-	Triangles.emplace_back(Triangle{ {0,1,0},{ 0,1,1 },{1,1,1},{0.0f,0.45f,0.0f,1.0f} });
+	Triangles.emplace_back(Triangle{ {0,1,0},{1,1,0},{1,1,1},{0.0f,0.45f,0.0f,1.0f}});
+	Triangles.emplace_back(Triangle{ {0,1,0},{0,1,1},{1,1,1},{0.0f,0.45f,0.0f,1.0f}});
+	// Left Face
+	Triangles.emplace_back(Triangle{ {0,0,0},{0,1,0},{0,1,1},{0.0f,0.45f,0.0f,1.0f}});
+	Triangles.emplace_back(Triangle{ {0,0,0},{0,1,1},{0,0,1},{0.0f,0.45f,0.0f,1.0f}});
+	// Right Face
+	Triangles.emplace_back(Triangle{ {1,0,0},{1,1,0},{1,1,1},{0.0f,0.45f,0.0f,1.0f} });
+	Triangles.emplace_back(Triangle{ {1,0,0},{1,1,1},{1,0,1},{0.0f,0.45f,0.0f,1.0f} });
 	// The Loop
 	for (int i = 0; i < Triangles.size(); i++) {
 		vector<SDL_Vertex> vertices(3);
