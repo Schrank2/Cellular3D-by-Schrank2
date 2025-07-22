@@ -7,37 +7,18 @@ using namespace std;
 #include <string>
 
 // Declaring the "Data Type" Voxel
-struct RGBA {
-	// Defining Components
-	int r, g, b, a;
-	// Defining Constructor
-	RGBA(int r, int g, int b, int a) : r(r), g(g), b(b), a(a) {}
-};;
-struct POS {
-	// Defining Components
-	float x, y;
-	// Defining Constructor
-	POS(float x, float y) : x(x), y(y) {}
-};
 struct POS3D {
 	// Defining Components
 	float x, y, z;
 	// Defining Constructor
 	POS3D(float x, float y, float z) : x(x), y(y), z(z) {}
 };
-struct Triangle {
-	// Defining Components
-	POS p1, p2, p3;
-	RGBA Color;
-	// Defining Constructor
-	Triangle(POS p1, POS p2, POS p3, RGBA Color) : p1(p1), p2(p2), p3(p3), Color(Color) {}
-};
 struct Voxel {
 	// Defining Components
 	POS3D Position;
-	RGBA Color;
+	SDL_Color Color;
 	// Defining Constructor
-	Voxel(POS3D Position, RGBA Color) : Position(Position), Color(Color) {}
+	Voxel(POS3D Position, SDL_Color Color) : Position(Position), Color(Color) {}
 };
 
 // Adding all Voxels to a list.
@@ -48,7 +29,7 @@ void readVoxels(const std::vector<std::vector<int>>& GameMap) {
 	for (int i = 0; i < GameWidth; i++) {
 		for (int j = 0; j < GameHeight; j++) {
 			if (GameMap[i][j] == 1) {
-				RGBA color(0, 255, 0, 255);
+				SDL_Color color(0, 255, 0, 255);
 				POS3D pos(i, j, 3);
 				Voxel v=Voxel(pos, color);
 				VoxelQueue.emplace_back(v);
@@ -56,15 +37,26 @@ void readVoxels(const std::vector<std::vector<int>>& GameMap) {
 		}
 	}
 }
-int ScreenCoordinateX(int x, int z) {
+float ScreenCoordinateX(float x, float z) {
 	return ScreenWidth * x / z + ScreenWidth / 2;
 }
-int ScreenCoordinateY(int y, int z) {
+float ScreenCoordinateY(float y, float z) {
 	return -ScreenHeight * y / z + ScreenHeight / 2;
 }
 void renderVoxel(Voxel V) {
 	cout << "Rendering Voxel at (" << V.Position.x << ", " << V.Position.y << ", " << V.Position.z << ") with color ("
 		<< V.Color.r << ", " << V.Color.g << ", " << V.Color.b << ", " << V.Color.a << ")" << endl;
+	vector<SDL_Vertex> vertices(3);
+	SDL_FPoint A = {ScreenCoordinateX(V.Position.x, V.Position.z), ScreenCoordinateY(V.Position.y, V.Position.z)};
+	SDL_FPoint B = {ScreenCoordinateX(V.Position.x, V.Position.z), ScreenCoordinateY(V.Position.y, V.Position.z)};
+	SDL_FPoint C = {ScreenCoordinateX(V.Position.x, V.Position.z), ScreenCoordinateY(V.Position.y, V.Position.z)};
+	vertices[0].position = A;
+	vertices[1].position = B;
+	vertices[2].position = C;
+	vertices[0].color = V.Color;
+	vertices[1].color = V.Color;
+	vertices[2].color = V.Color;
+	SDL_RenderGeometry(renderer, nullptr, vertices.data(), vertices.size(), nullptr, 0); // Clear previous geometry
 };
 void render3D() {
 	readVoxels(GameMap);
