@@ -27,6 +27,7 @@ struct Triangle {
 	// Defining Constructor
 	Triangle(POS3D A, POS3D B, POS3D C, SDL_FColor color) : A(A), B(B), C(C), color(color) {}
 };;
+vector<vector<SDL_Vertex>> TriangleQueue; // Queue for Triangles
 
 // Adding all Voxels to a list.
 std::vector<Voxel> VoxelQueue;
@@ -58,24 +59,24 @@ void renderVoxel(Voxel V) {
 	//cout << "Rendering Voxel at (" << V.position.x << ", " << V.position.y << ", " << V.position.z << ") with color (" << V.color.r << ", " << V.color.g << ", " << V.color.b << ", " << V.color.a << ")" << endl;
 	vector<Triangle> Triangles;
 	// Front Face
-	Triangles.emplace_back(Triangle{ {0,0,0},{0,1,0},{1,1,0},{0.0f,0.5f,0.0f,1.0f}});
-	Triangles.emplace_back(Triangle{ {0,0,0},{1,0,0},{1,1,0},{0.0f,0.5f,0.0f,1.0f}});
+	Triangles.emplace_back(Triangle{{0,0,0},{0,1,0},{1,1,0},{1.0f,0.0f,0.0f,1.0f}});
+	Triangles.emplace_back(Triangle{{0,0,0},{1,0,0},{1,1,0},{1.0f,0.0f,0.0f,1.0f}});
 	// Back Face
-	Triangles.emplace_back(Triangle{ {0,0,1},{0,1,1},{1,1,1},{0.0f,0.4f,0.0f,1.0f}});
-	Triangles.emplace_back(Triangle{ {0,0,1},{1,0,1},{1,1,1},{0.0f,0.4f,0.0f,1.0f}});
+	Triangles.emplace_back(Triangle{{0,0,1},{0,1,1},{1,1,1},{0.0f,1.0f,0.0f,1.0f}});
+	Triangles.emplace_back(Triangle{{0,0,1},{1,0,1},{1,1,1},{0.0f,1.0f,0.0f,1.0f}});
 	// Bottom Face
-	Triangles.emplace_back(Triangle{ {0,0,0},{1,0,0},{1,0,1},{0.0f,0.45f,0.0f,1.0f}});
-	Triangles.emplace_back(Triangle{ {0,0,0},{0,0,1},{1,0,1},{0.0f,0.45f,0.0f,1.0f}});
+	Triangles.emplace_back(Triangle{{0,0,0},{1,0,0},{1,0,1},{0.0f,0.0f,1.0f,1.0f}});
+	Triangles.emplace_back(Triangle{{0,0,0},{0,0,1},{1,0,1},{0.0f,0.0f,1.0f,1.0f}});
 	// Top Face
-	Triangles.emplace_back(Triangle{ {0,1,0},{1,1,0},{1,1,1},{0.0f,0.45f,0.0f,1.0f}});
-	Triangles.emplace_back(Triangle{ {0,1,0},{0,1,1},{1,1,1},{0.0f,0.45f,0.0f,1.0f}});
+	Triangles.emplace_back(Triangle{{0,1,0},{1,1,0},{1,1,1},{1.0f,1.0f,0.0f,1.0f}});
+	Triangles.emplace_back(Triangle{{0,1,0},{0,1,1},{1,1,1},{1.0f,1.0f,0.0f,1.0f}});
 	// Left Face
-	Triangles.emplace_back(Triangle{ {0,0,0},{0,1,0},{0,1,1},{0.0f,0.45f,0.0f,1.0f}});
-	Triangles.emplace_back(Triangle{ {0,0,0},{0,1,1},{0,0,1},{0.0f,0.45f,0.0f,1.0f}});
+	Triangles.emplace_back(Triangle{{0,0,0},{0,1,0},{0,1,1},{0.0f,1.0f,1.0f,1.0f}});
+	Triangles.emplace_back(Triangle{{0,0,0},{0,1,1},{0,0,1},{0.0f,1.0f,1.0f,1.0f}});
 	// Right Face
-	Triangles.emplace_back(Triangle{ {1,0,0},{1,1,0},{1,1,1},{0.0f,0.45f,0.0f,1.0f} });
-	Triangles.emplace_back(Triangle{ {1,0,0},{1,1,1},{1,0,1},{0.0f,0.45f,0.0f,1.0f} });
-	// The Loop
+	Triangles.emplace_back(Triangle{{1,0,0},{1,1,0},{1,1,1},{1.0f,0.0f,1.0f,1.0f}});
+	Triangles.emplace_back(Triangle{{1,0,0},{1,1,1},{1,0,1},{1.0f,0.0f,1.0f,1.0f}});
+	// The Loop for Drawing Triangles
 	for (int i = 0; i < Triangles.size(); i++) {
 		vector<SDL_Vertex> vertices(3);
 		SDL_FPoint A = { ScreenCoordinateX(V.position.x + Triangles[i].A.x, V.position.z+Triangles[i].A.z), ScreenCoordinateY(V.position.y+Triangles[i].A.y, V.position.z+ Triangles[i].A.z)};
@@ -90,13 +91,19 @@ void renderVoxel(Voxel V) {
 		vertices[0].tex_coord = { 0.0f, 0.0f };
 		vertices[1].tex_coord = { 0.0f, 0.0f };
 		vertices[2].tex_coord = { 0.0f, 0.0f };
-		SDL_RenderGeometry(renderer, nullptr, vertices.data(), vertices.size(), nullptr, 0);
+		TriangleQueue.push_back({vertices[0],vertices[1],vertices[2]});
 	}
 };
+static void DrawAllTriangles() {
+	for (int i=0; i<TriangleQueue.size(); i++) {
+		SDL_RenderGeometry(renderer, nullptr, TriangleQueue[i].data(), TriangleQueue[i].size(), nullptr, 0);
+	}
+}
 void render3D() {
 	readVoxels(GameMap);
 	for (int i = 0; i < VoxelQueue.size(); i++) {
 		//cout << VoxelQueue[i].x << " " << VoxelQueue[i].y << " " << VoxelQueue[i].z << " " << VoxelQueue[i].Color[0] << " " << VoxelQueue[i].Color[1] << " " << VoxelQueue[i].Color[2] << " " << VoxelQueue[i].Color[3] << endl;
 		renderVoxel(VoxelQueue[i]);
 	}
+	DrawAllTriangles();
 }
