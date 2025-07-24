@@ -76,6 +76,22 @@ void renderVoxel(Voxel V) {
 	// Right Face
 	Triangles.emplace_back(Triangle{{1,0,0},{1,1,0},{1,1,1},{1.0f,0.0f,1.0f,1.0f}});
 	Triangles.emplace_back(Triangle{{1,0,0},{1,1,1},{1,0,1},{1.0f,0.0f,1.0f,1.0f}});
+	// Depth Sorting
+	int comparison = 0;
+	int i, j, s;
+	Triangle tempTriangle = Triangles[0]; // Temporary Variable for Swapping
+	for (i = 0; i < Triangles.size() - 1; i++) { // Durch die Liste Iterieren
+		s = i; // Den Speicher auf die Ersten Position der Liste setzen.
+		for (j = i; j < Triangles.size(); j++) { // Ab dem Punkt in den der Erste Loop iteriert, alle restlichen Durchiterieren
+			comparison = comparison + 1; // Counter um die Menge an Vergleichen zu zählen.
+			if ((Triangles[s].A.z+ Triangles[s].B.z+Triangles[s].C.z) > (Triangles[j].A.z + Triangles[j].B.z + Triangles[j].C.z)) { // Vergleichen zwischen dem Wert der Gespeicherten Position und dem vom 2. Loop iterierten Wert.
+				s = j; // Speichern des 2.Loop-Werts, falls dieser größer als der bisherige Speicher ist.
+			}
+		}
+		tempTriangle = Triangles[s]; // Finales Tauschen des Zwischenspeichers mit dem ersten des zu bearbeitenden Bereich
+		Triangles[s] = Triangles[i];
+		Triangles[i] = tempTriangle;
+	};
 	// The Loop for Drawing Triangles
 	for (int i = 0; i < Triangles.size(); i++) {
 		vector<SDL_Vertex> vertices(3);
@@ -98,6 +114,7 @@ static void DrawAllTriangles() {
 	for (int i=0; i<TriangleQueue.size(); i++) {
 		SDL_RenderGeometry(renderer, nullptr, TriangleQueue[i].data(), TriangleQueue[i].size(), nullptr, 0);
 	}
+	TriangleQueue.clear(); // Clear the Triangle Queue after rendering
 }
 void render3D() {
 	readVoxels(GameMap);
