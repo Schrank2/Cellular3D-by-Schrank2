@@ -46,12 +46,12 @@ void readVoxels(const std::vector<std::vector<int>>& GameMap) {
 	}
 }
 float ScreenCoordinateX(float x, float z) {
-	float Depth = 1.0f + (0.03f * z); // Adjusting depth for perspective
+	float Depth = 0.03f * z; // Adjusting depth for perspective
 	float scale = ScreenWidth / static_cast<float>(GameWidth);
 	return (x / Depth) * scale;
 }
 float ScreenCoordinateY(float y, float z) {
-	float Depth = 1.0f + (0.03f * z); // Adjusting depth for perspective
+	float Depth = 0.03f * z; // Adjusting depth for perspective
 	float scale = ScreenHeight / static_cast<float>(GameHeight);
 	return (y / Depth) * scale;
 }
@@ -84,7 +84,7 @@ void renderVoxel(Voxel V) {
 		s = i; // Den Speicher auf die Ersten Position der Liste setzen.
 		for (j = i; j < Triangles.size(); j++) { // Ab dem Punkt in den der Erste Loop iteriert, alle restlichen Durchiterieren
 			comparison = comparison + 1; // Counter um die Menge an Vergleichen zu zählen.
-			if ((Triangles[s].A.z+ Triangles[s].B.z+Triangles[s].C.z) > (Triangles[j].A.z + Triangles[j].B.z + Triangles[j].C.z)) { // Vergleichen zwischen dem Wert der Gespeicherten Position und dem vom 2. Loop iterierten Wert.
+			if ((Triangles[s].A.z+ Triangles[s].B.z+Triangles[s].C.z) < (Triangles[j].A.z + Triangles[j].B.z + Triangles[j].C.z)) { // Vergleichen zwischen dem Wert der Gespeicherten Position und dem vom 2. Loop iterierten Wert.
 				s = j; // Speichern des 2.Loop-Werts, falls dieser größer als der bisherige Speicher ist.
 			}
 		}
