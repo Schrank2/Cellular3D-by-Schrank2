@@ -67,7 +67,7 @@ int game() {
 	// Filling the Game Map with random values
 	for (int i = 0; i < GameWidth; i++) {
 		for (int j = 0; j < GameHeight; j++) {
-			for (int k = 0; k < GameHeight; k++) {
+			for (int k = 0; k < GameDepth; k++) {
 				if (rand() % 10 > mapDensity * 10) {
 					GameMap[i][j][k] = 1;
 				}
