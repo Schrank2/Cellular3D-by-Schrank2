@@ -31,12 +31,12 @@ vector<Triangle> TriangleQueue; // Queue for Triangles
 
 // Adding all Voxels to a list.
 std::vector<Voxel> VoxelQueue;
-void readVoxels(const std::vector<std::vector<int>>& GameMap) {
+void readVoxels(const std::vector<std::vector<std::vector<int>>>& GameMap) {
 	// Clear the VoxelQueue
 	VoxelQueue.clear();
 	for (int i = 0; i < GameWidth; i++) {
 		for (int j = 0; j < GameHeight; j++) {
-			if (GameMap[i][j] == 1) {
+			if (GameMap[i][j][1] == 1) {
 				SDL_FColor color{0.0f, 0.5f, 0.0f, 1.0f};
 				POS3D pos(i, j, 1);
 				Voxel v=Voxel(pos, color);

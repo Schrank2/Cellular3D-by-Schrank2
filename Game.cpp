@@ -85,8 +85,11 @@ int game() {
 		if (CurrentTime - LastTime >= TickTime && Pause == 0) {
 			LastTime = CurrentTime;
 			// emptying GameMapNext
-			for (auto& row : GameMapNext)
-				fill(row.begin(), row.end(), 0);
+			for (auto& row : GameMapNext) {
+				for (auto& depthSlice : row) {
+					std::fill(depthSlice.begin(), depthSlice.end(), 0);
+				}
+			}
 			// Cellular Automata Logic
 			threads.clear();
 			int rowLength = GameHeight / ThreadCountUsed;
@@ -97,7 +100,7 @@ int game() {
 			}
 			for (auto& th : threads) { th.join(); };
 			// Apply Changes
-			swap(GameMap, GameMapNext); // Basically GameMap = GameMapNext; but Copilot says it's faster lol
+			std::swap(GameMap, GameMapNext); // Basically GameMap = GameMapNext; but Copilot says it's faster lol
 		}
 		render(GameMap);
 		SDL_GetMouseState(&mouseX, &mouseY); // Check mouse position
@@ -108,7 +111,7 @@ int game() {
 				mouseXgame = mouseX / GameScale;
 				mouseYgame = mouseY / GameScale;
 				if (mouseXgame >= 0 && mouseXgame < GameWidth && mouseYgame >= 0 && mouseYgame < GameHeight) {
-					GameMap[mouseXgame][mouseYgame][1] = !GameMap[mouseXgame][mouseYgame][1];
+					GameMap[mouseXgame][mouseYgame][0] = !GameMap[mouseXgame][mouseYgame][0];
 				}
 			}
 		}
