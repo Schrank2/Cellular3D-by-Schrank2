@@ -8,7 +8,7 @@ ScreenWidth=1600
 # The height of the game window in pixels
 ScreenHeight=900
 # The percentage of CPU threads to use for the game
-ThreadCountUsage=0.5
+ThreadCountUsage=1.0
 # Time between game ticks in milliseconds
 TickTime=1
 # Should debug messages be printed to the console

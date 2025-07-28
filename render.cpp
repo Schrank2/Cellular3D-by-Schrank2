@@ -8,8 +8,6 @@
 using namespace std;
 int Toggle=0;
 float temp = 0;
-mutex renderLock;
-vector<thread> RenderThreads;
 vector<vector<SDL_FRect>> RenderRects(ThreadCountUsed);
 
 SDL_Texture* genCellTexture() { // Lots of Help from Copilot
@@ -44,21 +42,6 @@ SDL_Texture* genCellTexture() { // Lots of Help from Copilot
 	// Reset render target
 	SDL_SetRenderTarget(renderer, prevTarget);
 	return Texture;
-}
-
-static void renderThreaded(int Thread,const std::vector<std::vector<std::vector<int>>>& GameMap,int txMin, int txMax, int tyMin, int tyMax) {
-	SDL_FRect rect;
-	for (int i = txMin; i < txMax; i++) {
-		for (int j = tyMin; j < tyMax; j++) {
-			if (GameMap[i][j][1] == 1) {
-				// Drawing the Texture onto the screen
-				rect = { static_cast<float>(i * GameScale), static_cast<float>(j * GameScale), static_cast<float>(GameScale), static_cast<float>(GameScale)};
-				renderLock.lock(); // Used to avoid Deadlock Issue
-				RenderRects[Thread].push_back(rect);
-				renderLock.unlock();
-			}
-		}
-	}
 }
 
 void render(const vector<vector<vector<int>>>& GameMap) {

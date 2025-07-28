@@ -5,6 +5,12 @@ using namespace std;
 #include "functions.h"
 #include <vector>
 #include <string>
+#include <thread>
+#include <mutex>
+
+mutex renderLock;
+vector<thread> RenderThreads;
+
 
 // Declaring the "Data Type" Voxel
 struct POS3D {
@@ -124,11 +130,29 @@ static void DrawTriangle(Triangle T) {
 	SDL_RenderGeometry(renderer, nullptr, vertices.data(), vertices.size(), nullptr, 0);
 }
 
+void renderThread(int Thread, int yMin, int yMax) {
+	for (int i = yMin; i < yMax; i++) {
+		renderLock.lock(); // Used to avoid Deadlock Issue
+		renderVoxel(VoxelQueue[i]);
+		renderLock.unlock();
+	}
+}
 void render3D() {
 	readVoxels(GameMap);
 	for (int i = 0; i < VoxelQueue.size(); i++) {
 		renderVoxel(VoxelQueue[i]);
 	}
+	// Rendering Multithreaded
+	RenderThreads.clear();
+	int rowLength = GameHeight / ThreadCountUsed;
+	for (int i = 0; i < ThreadCountUsed; i++) {
+		int yMin = i * rowLength;
+		int yMax = (i == ThreadCountUsed - 1) ? GameHeight : (i + 1) * rowLength; // the last thread takes the remaining rows
+		// Start the thread to render the voxels
+		RenderThreads.emplace_back(renderThread, i, yMin, yMax);
+
+	}
+	for (auto& th : RenderThreads) { th.join(); }; // Wait for the Rectangles to be calculated
 	// Sort the Triangles by Depth
 	int comparison = 0;
 	int i, j, s;
