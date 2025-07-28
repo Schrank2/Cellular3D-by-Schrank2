@@ -16,12 +16,13 @@ float ThreadCountUsage;
 int TickTime;
 int GameWidth;
 int GameHeight;
+int GameDepth = 3; // The depth of the game map, can be used for 3D rendering
 int ThreadCount;
 int ThreadCountUsed; // Number of threads used
 SDL_Window* window;
 SDL_Renderer* renderer;
-vector<vector<int>> GameMap;
-vector<vector<int>> GameMapNext;
+vector<vector<vector<int>>> GameMap;
+vector<vector<vector<int>>> GameMapNext;
 // using pointers because weird
 int main(int argc, char* argv[])
 {
@@ -38,8 +39,8 @@ int main(int argc, char* argv[])
 	ThreadCount = thread::hardware_concurrency();
 	ThreadCountUsed; // Number of threads used
 	ThreadCountUsed = ThreadCount * ThreadCountUsage;
-	GameMap.resize(GameWidth, vector<int>(GameHeight));
-	GameMapNext.resize(GameWidth, vector<int>(GameHeight));
+	GameMap.resize(GameWidth, vector<vector<int>>(GameHeight, vector<int>(GameDepth)));
+	GameMapNext.resize(GameWidth, vector<vector<int>>(GameHeight, vector<int>(GameDepth)));
 
 	if (SDL_Init( SDL_INIT_VIDEO or SDL_INIT_AUDIO) < 0)
 	{

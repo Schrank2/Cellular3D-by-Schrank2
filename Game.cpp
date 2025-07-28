@@ -15,6 +15,7 @@ int CameraY = 0;
 int CameraZ = 0;
 int GameTemp = 0;
 int Pause = 0;
+int k = 1;
 float mouseX, mouseY;
 int mouseXgame, mouseYgame;
 const int neighborOffsets[8][2] = {
@@ -28,26 +29,28 @@ static void CellularAutomataRules(int txMin,int txMax,int tyMin, int tyMax) {
 	int survive; int neighbors;
 	for (int i = txMin; i < txMax; i++) {
 		for (int j = tyMin; j < tyMax; j++) {
-			survive = 0; neighbors = 0;
-			if (GameMap[i][j] == 1) { survive = 1; }
-			// Determine Neighbors
-			for (int k = 0; k < 8; k++) {
-				int ni = i + neighborOffsets[k][0];
-				int nj = j + neighborOffsets[k][1];
-				if (ni >= 0 && ni < GameWidth && nj >= 0 && nj < GameHeight) {
-					if (GameMap[ni][nj] == 1) {
-						neighbors++;
+			for (int k = tyMin; k < tyMax; k++) {
+				survive = 0; neighbors = 0;
+				if (GameMap[i][j][k] == 1) { survive = 1; }
+				// Determine Neighbors
+				for (int o = 0; o < 8; o++) {
+					int ni = i + neighborOffsets[o][0];
+					int nj = j + neighborOffsets[o][1];
+					if (ni >= 0 && ni < GameWidth && nj >= 0 && nj < GameHeight) {
+						if (GameMap[ni][nj][k] == 1) {
+							neighbors++;
+						}
 					}
 				}
-			}
-			if (neighbors < 2) { survive = 0; }// Underpopulation
-			if (neighbors > 3) { survive = 0; }// Overpopulation
-			if (neighbors == 3) { survive = 1; } // Reproduction
-			if (survive == 1) {
-				GameMapNext[i][j] = 1; // Cell survives
-			}
-			else {
-				GameMapNext[i][j] = 0; // Cell dies
+				if (neighbors < 2) { survive = 0; }// Underpopulation
+				if (neighbors > 3) { survive = 0; }// Overpopulation
+				if (neighbors == 3) { survive = 1; } // Reproduction
+				if (survive == 1) {
+					GameMapNext[i][j][k] = 1; // Cell survives
+				}
+				else {
+					GameMapNext[i][j][k] = 0; // Cell dies
+				}
 			}
 		}
 	}
@@ -64,11 +67,13 @@ int game() {
 	// Filling the Game Map with random values
 	for (int i = 0; i < GameWidth; i++) {
 		for (int j = 0; j < GameHeight; j++) {
-			if (rand() % 10 > mapDensity*10) {
-				GameMap[i][j] = 1;
-			}
-			else {
-				GameMap[i][j] = 0;
+			for (int k = 0; k < GameHeight; k++) {
+				if (rand() % 10 > mapDensity * 10) {
+					GameMap[i][j][k] = 1;
+				}
+				else {
+					GameMap[i][j][k] = 0;
+				}
 			}
 		}
 	}
@@ -103,7 +108,7 @@ int game() {
 				mouseXgame = mouseX / GameScale;
 				mouseYgame = mouseY / GameScale;
 				if (mouseXgame >= 0 && mouseXgame < GameWidth && mouseYgame >= 0 && mouseYgame < GameHeight) {
-					GameMap[mouseXgame][mouseYgame] = !GameMap[mouseXgame][mouseYgame];
+					GameMap[mouseXgame][mouseYgame][1] = !GameMap[mouseXgame][mouseYgame][1];
 				}
 			}
 		}
