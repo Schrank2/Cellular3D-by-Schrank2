@@ -27,7 +27,7 @@ struct Triangle {
 	// Defining Constructor
 	Triangle(POS3D A, POS3D B, POS3D C, SDL_FColor color) : A(A), B(B), C(C), color(color) {}
 };;
-vector<vector<SDL_Vertex>> TriangleQueue; // Queue for Triangles
+vector<Triangle> TriangleQueue; // Queue for Triangles
 
 // Adding all Voxels to a list.
 std::vector<Voxel> VoxelQueue;
@@ -46,12 +46,12 @@ void readVoxels(const std::vector<std::vector<int>>& GameMap) {
 	}
 }
 float ScreenCoordinateX(float x, float z) {
-	float Depth = 0.03f * z; // Adjusting depth for perspective
+	float Depth = 1 + (0.03f * z); // Adjusting depth for perspective
 	float scale = ScreenWidth / static_cast<float>(GameWidth);
 	return (x / Depth) * scale;
 }
 float ScreenCoordinateY(float y, float z) {
-	float Depth = 0.03f * z; // Adjusting depth for perspective
+	float Depth = 1+ (0.03f * z); // Adjusting depth for perspective
 	float scale = ScreenHeight / static_cast<float>(GameHeight);
 	return (y / Depth) * scale;
 }
@@ -76,51 +76,64 @@ void renderVoxel(Voxel V) {
 	// Right Face
 	Triangles.emplace_back(Triangle{{1,0,0},{1,1,0},{1,1,1},{1.0f,0.0f,1.0f,1.0f}});
 	Triangles.emplace_back(Triangle{{1,0,0},{1,1,1},{1,0,1},{1.0f,0.0f,1.0f,1.0f}});
-	// Depth Sorting
-	int comparison = 0;
-	int i, j, s;
-	Triangle tempTriangle = Triangles[0]; // Temporary Variable for Swapping
-	for (i = 0; i < Triangles.size() - 1; i++) { // Durch die Liste Iterieren
-		s = i; // Den Speicher auf die Ersten Position der Liste setzen.
-		for (j = i; j < Triangles.size(); j++) { // Ab dem Punkt in den der Erste Loop iteriert, alle restlichen Durchiterieren
-			comparison = comparison + 1; // Counter um die Menge an Vergleichen zu zählen.
-			if ((Triangles[s].A.z+ Triangles[s].B.z+Triangles[s].C.z) < (Triangles[j].A.z + Triangles[j].B.z + Triangles[j].C.z)) { // Vergleichen zwischen dem Wert der Gespeicherten Position und dem vom 2. Loop iterierten Wert.
-				s = j; // Speichern des 2.Loop-Werts, falls dieser größer als der bisherige Speicher ist.
-			}
-		}
-		tempTriangle = Triangles[s]; // Finales Tauschen des Zwischenspeichers mit dem ersten des zu bearbeitenden Bereich
-		Triangles[s] = Triangles[i];
-		Triangles[i] = tempTriangle;
-	};
+
+	
 	// The Loop for Drawing Triangles
 	for (int i = 0; i < Triangles.size(); i++) {
-		vector<SDL_Vertex> vertices(3);
-		SDL_FPoint A = { ScreenCoordinateX(V.position.x + Triangles[i].A.x, V.position.z+Triangles[i].A.z), ScreenCoordinateY(V.position.y+Triangles[i].A.y, V.position.z+ Triangles[i].A.z)};
-		SDL_FPoint B = { ScreenCoordinateX(V.position.x + Triangles[i].B.x, V.position.z + Triangles[i].B.z), ScreenCoordinateY(V.position.y + Triangles[i].B.y, V.position.z + Triangles[i].B.z) };
-		SDL_FPoint C = { ScreenCoordinateX(V.position.x + Triangles[i].C.x, V.position.z + Triangles[i].C.z), ScreenCoordinateY(V.position.y + Triangles[i].C.y, V.position.z + Triangles[i].C.z) };
-		vertices[0].position = A;
-		vertices[1].position = B;
-		vertices[2].position = C;
-		vertices[0].color = Triangles[i].color;
-		vertices[1].color = Triangles[i].color;
-		vertices[2].color = Triangles[i].color;
-		vertices[0].tex_coord = { 0.0f, 0.0f };
-		vertices[1].tex_coord = { 0.0f, 0.0f };
-		vertices[2].tex_coord = { 0.0f, 0.0f };
-		TriangleQueue.push_back({vertices[0],vertices[1],vertices[2]});
+		// Adjusting the position of the triangle based on the voxel position
+		Triangles[i].A.x += V.position.x;
+		Triangles[i].A.y += V.position.y;
+		Triangles[i].A.z += V.position.z;
+		Triangles[i].B.x += V.position.x;
+		Triangles[i].B.y += V.position.y;
+		Triangles[i].B.z += V.position.z;
+		Triangles[i].C.x += V.position.x;
+		Triangles[i].C.y += V.position.y;
+		Triangles[i].C.z += V.position.z;
+		TriangleQueue.emplace_back(Triangles[i]);
 	}
 };
-static void DrawAllTriangles() {
-	for (int i=0; i<TriangleQueue.size(); i++) {
-		SDL_RenderGeometry(renderer, nullptr, TriangleQueue[i].data(), TriangleQueue[i].size(), nullptr, 0);
-	}
-	TriangleQueue.clear(); // Clear the Triangle Queue after rendering
+static void DrawTriangle(Triangle T) {
+	vector<SDL_Vertex> vertices(3);
+	SDL_FPoint A = { ScreenCoordinateX(T.A.x,T.A.z),ScreenCoordinateY(T.A.y,T.A.z)};
+	SDL_FPoint B = { ScreenCoordinateX(T.B.x,T.B.z),ScreenCoordinateY(T.B.y,T.B.z)};
+	SDL_FPoint C = { ScreenCoordinateX(T.C.x,T.C.z),ScreenCoordinateY(T.C.y,T.C.z)};
+	vertices[0].position = A;
+	vertices[1].position = B;
+	vertices[2].position = C;
+	vertices[0].color = T.color;
+	vertices[1].color = T.color;
+	vertices[2].color = T.color;
+	vertices[0].tex_coord = { 0.0f, 0.0f };
+	vertices[1].tex_coord = { 0.0f, 0.0f };
+	vertices[2].tex_coord = { 0.0f, 0.0f };
+	SDL_RenderGeometry(renderer, nullptr, vertices.data(), vertices.size(), nullptr, 0);
 }
+
 void render3D() {
 	readVoxels(GameMap);
 	for (int i = 0; i < VoxelQueue.size(); i++) {
-		//cout << VoxelQueue[i].x << " " << VoxelQueue[i].y << " " << VoxelQueue[i].z << " " << VoxelQueue[i].Color[0] << " " << VoxelQueue[i].Color[1] << " " << VoxelQueue[i].Color[2] << " " << VoxelQueue[i].Color[3] << endl;
 		renderVoxel(VoxelQueue[i]);
 	}
-	DrawAllTriangles();
+	// Sort the Triangles by Depth
+	int comparison = 0;
+	int i, j, s;
+	Triangle tempTriangle = TriangleQueue[0]; // Temporary Variable for Swapping
+	for (i = 0; i < TriangleQueue.size() - 1; i++) { // Durch die Liste Iterieren
+		s = i; // Den Speicher auf die Ersten Position der Liste setzen.
+		for (j = i; j < TriangleQueue.size(); j++) { // Ab dem Punkt in den der Erste Loop iteriert, alle restlichen Durchiterieren
+			comparison = comparison + 1; // Counter um die Menge an Vergleichen zu zählen.
+			if ((TriangleQueue[s].A.z + TriangleQueue[s].B.z + TriangleQueue[s].C.z) < (TriangleQueue[j].A.z + TriangleQueue[j].B.z + TriangleQueue[j].C.z)) { // Vergleichen zwischen dem Wert der Gespeicherten Position und dem vom 2. Loop iterierten Wert.
+				s = j; // Speichern des 2.Loop-Werts, falls dieser größer als der bisherige Speicher ist.
+			}
+		}
+		tempTriangle = TriangleQueue[s]; // Finales Tauschen des Zwischenspeichers mit dem ersten des zu bearbeitenden Bereich
+		TriangleQueue[s] = TriangleQueue[i];
+		TriangleQueue[i] = tempTriangle;
+	};
+	// Render all Triangles
+	for (int i = 0; i < TriangleQueue.size(); i++) {
+		DrawTriangle(TriangleQueue[i]);
+	}
+	TriangleQueue.clear(); // Clear the Triangle Queue after rendering
 }

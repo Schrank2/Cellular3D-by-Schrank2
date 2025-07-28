@@ -10,4 +10,4 @@ ScreenHeight=900
 # The percentage of CPU threads to use for the game
 ThreadCountUsage=0.5
 # Time between game ticks in milliseconds
-TickTime=1500
+TickTime=1
