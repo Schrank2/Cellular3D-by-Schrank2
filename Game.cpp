@@ -29,7 +29,7 @@ static void CellularAutomataRules(int txMin,int txMax,int tyMin, int tyMax) {
 	int survive; int neighbors;
 	for (int i = txMin; i < txMax; i++) {
 		for (int j = tyMin; j < tyMax; j++) {
-			for (int k = tyMin; k < tyMax; k++) {
+			for (int k = 0; k < GameDepth; k++) {
 				survive = 0; neighbors = 0;
 				if (GameMap[i][j][k] == 1) { survive = 1; }
 				// Determine Neighbors

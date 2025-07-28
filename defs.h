@@ -27,4 +27,5 @@ extern int ScreenWidth; // The width of the game window in pixels
 extern int ScreenHeight; // The height of the game window in pixels
 extern float ThreadCountUsage; // The percentage of CPU threads to use for the game
 extern int TickTime; // Time between game ticks in milliseconds
+extern bool Debug; // Should debug messages be printed to the console
 #endif

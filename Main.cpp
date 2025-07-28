@@ -7,13 +7,13 @@
 #include <string>
 #include <functional>
 using namespace std;
-std::vector<string> settings;
 int GameScale;
 float mapDensity;
 int ScreenWidth;
 int ScreenHeight;
 float ThreadCountUsage;
 int TickTime;
+bool Debug;
 int GameWidth;
 int GameHeight;
 int GameDepth = 3; // The depth of the game map, can be used for 3D rendering
@@ -34,6 +34,7 @@ int main(int argc, char* argv[])
 	ScreenHeight = stoi(settings[3]); // The height of the game window in pixels
 	ThreadCountUsage = stof(settings[4]); // The percentage of CPU threads to use for the game
 	TickTime = stoi(settings[5]); // Time between game ticks in milliseconds
+	if (settings[6] == "true") { Debug = true; }; // Should debug messages be printed to the console
 	GameWidth = ScreenWidth / GameScale;
 	GameHeight = ScreenHeight / GameScale;
 	ThreadCount = thread::hardware_concurrency();
@@ -41,7 +42,7 @@ int main(int argc, char* argv[])
 	ThreadCountUsed = ThreadCount * ThreadCountUsage;
 	GameMap.resize(GameWidth, vector<vector<int>>(GameHeight, vector<int>(GameDepth)));
 	GameMapNext.resize(GameWidth, vector<vector<int>>(GameHeight, vector<int>(GameDepth)));
-
+	if (Debug = true) { cout << "Successfully Read Settings" << endl; }
 	if (SDL_Init( SDL_INIT_VIDEO or SDL_INIT_AUDIO) < 0)
 	{
 		cout << "SDL initialization failed. SDL Error: " << SDL_GetError();

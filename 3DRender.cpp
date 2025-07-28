@@ -36,21 +36,23 @@ void readVoxels(const std::vector<std::vector<std::vector<int>>>& GameMap) {
 	VoxelQueue.clear();
 	for (int i = 0; i < GameWidth; i++) {
 		for (int j = 0; j < GameHeight; j++) {
-			if (GameMap[i][j][1] == 1) {
-				SDL_FColor color{0.0f, 0.5f, 0.0f, 1.0f};
-				POS3D pos(i, j, 1);
-				Voxel v=Voxel(pos, color);
-				VoxelQueue.emplace_back(v);
+			for (int k = 0; k < GameDepth; k++) {
+				if (GameMap[i][j][k] == 1) {
+					SDL_FColor color{ 0.0f, 0.5f, 0.0f, 1.0f };
+					POS3D pos(i, j, k);
+					Voxel v = Voxel(pos, color);
+					VoxelQueue.emplace_back(v);
+				}
 			}
 		}
 	}
 }
-float ScreenCoordinateX(float x, float z) {
+static float ScreenCoordinateX(float x, float z) {
 	float Depth = 1 + (0.03f * z); // Adjusting depth for perspective
 	float scale = ScreenWidth / static_cast<float>(GameWidth);
 	return (x / Depth) * scale;
 }
-float ScreenCoordinateY(float y, float z) {
+static float ScreenCoordinateY(float y, float z) {
 	float Depth = 1+ (0.03f * z); // Adjusting depth for perspective
 	float scale = ScreenHeight / static_cast<float>(GameHeight);
 	return (y / Depth) * scale;

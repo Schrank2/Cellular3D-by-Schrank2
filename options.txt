@@ -11,3 +11,5 @@ ScreenHeight=900
 ThreadCountUsage=0.5
 # Time between game ticks in milliseconds
 TickTime=1
+# Should debug messages be printed to the console
+Debug=true

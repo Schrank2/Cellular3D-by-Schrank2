@@ -8,7 +8,7 @@ using namespace std;
 // https://www.w3schools.com/cpp/cpp_files.asp
 
 vector<string> readSettings() {
-	std::vector<std::string> Variables(6);
+	std::vector<std::string> Variables(7);
 	cout << endl << "Reading Settings from options.txt" << endl;
 	string settingsFile;
 	// Read from the text file
@@ -53,6 +53,8 @@ vector<string> readSettings() {
 			Variables[4] = value;
 		} else if (key == "TickTime") {
 			Variables[5] = value;
+		} else if (key == "Debug") {
+			Variables[6] = value;
 		}
 	}
 	return Variables;
