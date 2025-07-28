@@ -16,7 +16,7 @@ int TickTime;
 bool Debug;
 int GameWidth;
 int GameHeight;
-int GameDepth = 3; // The depth of the game map, can be used for 3D rendering
+int GameDepth; // The depth of the game map, can be used for 3D rendering
 int ThreadCount;
 int ThreadCountUsed; // Number of threads used
 SDL_Window* window;
@@ -37,6 +37,7 @@ int main(int argc, char* argv[])
 	if (settings[6] == "true") { Debug = true; }; // Should debug messages be printed to the console
 	GameWidth = ScreenWidth / GameScale;
 	GameHeight = ScreenHeight / GameScale;
+	GameDepth = GameHeight; // The depth of the game map, can be used for 3D rendering
 	ThreadCount = thread::hardware_concurrency();
 	ThreadCountUsed; // Number of threads used
 	ThreadCountUsed = ThreadCount * ThreadCountUsage;

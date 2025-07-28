@@ -38,7 +38,11 @@ void readVoxels(const std::vector<std::vector<std::vector<int>>>& GameMap) {
 		for (int j = 0; j < GameHeight; j++) {
 			for (int k = 0; k < GameDepth; k++) {
 				if (GameMap[i][j][k] == 1) {
-					SDL_FColor color{ 0.0f, 0.5f, 0.0f, 1.0f };
+					float d = 0.5f;
+					if (k != 0) {
+						d = 1.0f / k;
+					}
+					SDL_FColor color{ 0.0f , 0.0f , 0.0f , 1.0f }; // LATER UNUSED !!!
 					POS3D pos(i, j, k);
 					Voxel v = Voxel(pos, color);
 					VoxelQueue.emplace_back(v);
@@ -103,9 +107,17 @@ static void DrawTriangle(Triangle T) {
 	vertices[0].position = A;
 	vertices[1].position = B;
 	vertices[2].position = C;
-	vertices[0].color = T.color;
-	vertices[1].color = T.color;
-	vertices[2].color = T.color;
+	// Set the color of the vertices
+	float c = min(T.A.z, min(T.B.z, T.C.z));
+	if (c != 0.0f) { // Avoid division by zero
+		c = 1 / c;
+	} else {
+		c = 1.0f;
+	}
+	SDL_FColor Color = { T.color.r * c,T.color.g * c,T.color.b * c,T.color.a };
+	vertices[0].color = Color;
+	vertices[1].color = Color;
+	vertices[2].color = Color;
 	vertices[0].tex_coord = { 0.0f, 0.0f };
 	vertices[1].tex_coord = { 0.0f, 0.0f };
 	vertices[2].tex_coord = { 0.0f, 0.0f };

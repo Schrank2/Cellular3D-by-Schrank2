@@ -69,26 +69,10 @@ void render(const vector<vector<vector<int>>>& GameMap) {
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	SDL_RenderClear(renderer); // Clear the screen with white color
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-	// Rendering Multithreaded
+	// Rendering 3D
 	render3D();
 	// Rendering Multithreaded
-	RenderThreads.clear();
-	for (auto& rects : RenderRects) { // clear old rectangles
-		rects.clear();
-	}
-	RenderRects.resize(ThreadCountUsed);
-	int rowLength = GameHeight / ThreadCountUsed;
-	for (int i = 0; i < ThreadCountUsed; i++) {
-		int yMin = i * rowLength;
-		int yMax = (i == ThreadCountUsed - 1) ? GameHeight : (i + 1) * rowLength; // the last thread takes the remaining rows
-		RenderThreads.emplace_back(renderThreaded, i, GameMap, 0, GameWidth, yMin, yMax);
-	}
-	for (auto& th : RenderThreads) { th.join(); }; // Wait for the Rectangles to be calculated
-	for (int j = 0; j < ThreadCountUsed; j++) { // Draw the Textures into the Rectangles
-		for (int i = 0; i < RenderRects[j].size(); i++) {
-			SDL_RenderTexture(renderer, cellTexture, nullptr, &RenderRects[j][i]);
-		}
-	}
+	// Place to paste it back in later
 	// Showing the Result
 	SDL_RenderPresent(renderer);
 }
