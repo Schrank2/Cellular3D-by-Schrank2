@@ -37,7 +37,7 @@ vector<Triangle> TriangleQueue; // Queue for Triangles
 
 // Adding all Voxels to a list.
 std::vector<Voxel> VoxelQueue;
-void readVoxels(const std::vector<std::vector<std::vector<int>>>& GameMap) {
+void readVoxels(const std::vector<std::vector<std::vector<int>>>& GameMap,int min, int max) {
 	// Clear the VoxelQueue
 	VoxelQueue.clear();
 	for (int i = 0; i < GameWidth; i++) {
@@ -138,7 +138,8 @@ void renderThread(int Thread, int yMin, int yMax) {
 	}
 }
 void render3D() {
-	readVoxels(GameMap);
+	// Multithreaded Map Reading
+	readVoxels(GameMap, 0, GameMap.size());
 	for (int i = 0; i < VoxelQueue.size(); i++) {
 		renderVoxel(VoxelQueue[i]);
 	}
