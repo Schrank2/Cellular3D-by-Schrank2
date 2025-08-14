@@ -58,11 +58,15 @@ static void readVoxels(const std::vector<std::vector<std::vector<int>>>& GameMap
 	}
 }
 static float ScreenCoordinateX(float x, float z) {
+	x = x - CameraX;
+	z = z - CameraZ;
 	float Depth = 1 + (0.03f * z); // Adjusting depth for perspective
 	float scale = ScreenWidth / static_cast<float>(GameWidth);
-	return (x / Depth) * scale;
+	return (x / Depth) * scale + (ScreenWidth / 4.0f);
 }
 static float ScreenCoordinateY(float y, float z) {
+	y = y - CameraY;
+	z = z - CameraZ;
 	float Depth = 1+ (0.03f * z); // Adjusting depth for perspective
 	float scale = ScreenHeight / static_cast<float>(GameHeight);
 	return (y / Depth) * scale;
