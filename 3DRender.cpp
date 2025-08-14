@@ -37,10 +37,10 @@ vector<Triangle> TriangleQueue; // Queue for Triangles
 
 // Adding all Voxels to a list.
 std::vector<Voxel> VoxelQueue;
-void readVoxels(const std::vector<std::vector<std::vector<int>>>& GameMap,int min, int max) {
+static void readVoxels(const std::vector<std::vector<std::vector<int>>>& GameMap,int min, int max) {
 	// Clear the VoxelQueue
 	VoxelQueue.clear();
-	for (int i = 0; i < GameWidth; i++) {
+	for (int i = min; i < max; i++) {
 		for (int j = 0; j < GameHeight; j++) {
 			for (int k = 0; k < GameDepth; k++) {
 				if (GameMap[i][j][k] == 1) {
@@ -138,14 +138,24 @@ void renderThread(int Thread, int yMin, int yMax) {
 	}
 }
 void render3D() {
+	// Multithreading base variable
+	int rowLength = GameHeight / ThreadCountUsed;
 	// Multithreaded Map Reading
-	readVoxels(GameMap, 0, GameMap.size());
+	RenderThreads.clear();
+	for (int i = 0; i < ThreadCountUsed; i++) {
+		int yMin = i * rowLength;
+		int yMax = (i == ThreadCountUsed - 1) ? GameHeight : (i + 1) * rowLength; // the last thread takes the remaining rows
+		// Start the thread to render the voxels
+		RenderThreads.emplace_back(readVoxels, GameMap, yMin, yMax);
+
+	}
+	for (auto& th : RenderThreads) { th.join(); }; // Wait for the Rectangles to be calculated
+	//
 	for (int i = 0; i < VoxelQueue.size(); i++) {
 		renderVoxel(VoxelQueue[i]);
 	}
 	// Rendering Multithreaded
 	RenderThreads.clear();
-	int rowLength = GameHeight / ThreadCountUsed;
 	for (int i = 0; i < ThreadCountUsed; i++) {
 		int yMin = i * rowLength;
 		int yMax = (i == ThreadCountUsed - 1) ? GameHeight : (i + 1) * rowLength; // the last thread takes the remaining rows
