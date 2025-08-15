@@ -34,6 +34,7 @@ struct Triangle {
 	Triangle(POS3D A, POS3D B, POS3D C, SDL_FColor color) : A(A), B(B), C(C), color(color) {}
 };;
 vector<Triangle> TriangleQueue; // Queue for Triangles
+vector<SDL_Vertex> VerticeQueue; // Queue for Vertice Groups
 
 // Adding all Voxels to a list.
 std::vector<Voxel> VoxelQueue;
@@ -71,12 +72,23 @@ static float ScreenCoordinateY(float y, float z) {
 	float scale = ScreenHeight / static_cast<float>(GameHeight);
 	return (y / Depth) * scale;
 }
-void renderVoxel(Voxel V) {
+static bool isVoxelEmpty(int x, int y, int z) {
+	return (x >= 0 && x < GameWidth &&
+		y >= 0 && y < GameHeight &&
+		z >= 0 && z < GameDepth &&
+		GameMap[x][y][z] == 0);
+}
+static void renderVoxel(Voxel V) {
 	//cout << "Rendering Voxel at (" << V.position.x << ", " << V.position.y << ", " << V.position.z << ") with color (" << V.color.r << ", " << V.color.g << ", " << V.color.b << ", " << V.color.a << ")" << endl;
 	vector<Triangle> Triangles;
+	int x = V.position.x;
+	int y = V.position.y;
+	int z = V.position.z;
 	// Front Face
-	Triangles.emplace_back(Triangle{{0,0,0},{0,1,0},{1,1,0},{1.0f,0.0f,0.0f,1.0f}});
-	Triangles.emplace_back(Triangle{{0,0,0},{1,0,0},{1,1,0},{1.0f,0.0f,0.0f,1.0f}});
+	if (isVoxelEmpty(x,y,z+1)) { // Only render if the voxel is at the front
+		Triangles.emplace_back(Triangle{ {0,0,0},{0,1,0},{1,1,0},{1.0f,0.0f,0.0f,1.0f} });
+		Triangles.emplace_back(Triangle{ {0,0,0},{1,0,0},{1,1,0},{1.0f,0.0f,0.0f,1.0f} });
+	}
 	// Back Face
 	Triangles.emplace_back(Triangle{{0,0,1},{0,1,1},{1,1,1},{0.0f,1.0f,0.0f,1.0f}});
 	Triangles.emplace_back(Triangle{{0,0,1},{1,0,1},{1,1,1},{0.0f,1.0f,0.0f,1.0f}});
@@ -131,10 +143,12 @@ static void DrawTriangle(Triangle T) {
 	vertices[0].tex_coord = { 0.0f, 0.0f };
 	vertices[1].tex_coord = { 0.0f, 0.0f };
 	vertices[2].tex_coord = { 0.0f, 0.0f };
-	SDL_RenderGeometry(renderer, nullptr, vertices.data(), vertices.size(), nullptr, 0);
+	VerticeQueue.push_back(vertices[0]); // Add the 1st vertex to the queue
+	VerticeQueue.push_back(vertices[1]); // Add the 2nd vertex to the queue
+	VerticeQueue.push_back(vertices[2]); // Add the 3rd vertex to the queue
 }
 
-void renderThread(int Thread, int yMin, int yMax) {
+static void renderThread(int Thread, int yMin, int yMax) {
 	for (int i = yMin; i < yMax; i++) {
 		renderLock.lock(); // Used to avoid Deadlock Issue
 		renderVoxel(VoxelQueue[i]);
@@ -188,5 +202,9 @@ void render3D() {
 	for (int i = 0; i < TriangleQueue.size(); i++) {
 		DrawTriangle(TriangleQueue[i]);
 	}
+	if (!VerticeQueue.empty()) {
+		SDL_RenderGeometry(renderer, nullptr, VerticeQueue.data(), VerticeQueue.size(), nullptr, 0);
+	}
+	VerticeQueue.clear(); // Clear the Vertice Queue after rendering
 	TriangleQueue.clear(); // Clear the Triangle Queue after rendering
 }
