@@ -9,6 +9,7 @@ using namespace std;
 SDL_Texture* cellTexture;
 int StartTime;
 int CurrentTime;
+float TaskTime;
 int LastTime;
 int CameraX = 0;
 int CameraY = 0;
@@ -83,6 +84,8 @@ int game() {
 	while (1) {
 		CurrentTime = SDL_GetTicks() - StartTime;
 		if (CurrentTime - LastTime >= TickTime && Pause == 0) {
+			cout << "Tick started" << endl;
+			TaskTime = SDL_GetTicks();
 			LastTime = CurrentTime;
 			// emptying GameMapNext
 			for (auto& row : GameMapNext) {
@@ -101,8 +104,12 @@ int game() {
 			for (auto& th : threads) { th.join(); };
 			// Apply Changes
 			std::swap(GameMap, GameMapNext); // Basically GameMap = GameMapNext; but Copilot says it's faster lol
+			cout << "Tick ended, took " << SDL_GetTicks()- TaskTime << "ms" << endl;
 		}
+		cout << "Render started" << endl;
+		TaskTime = SDL_GetTicks();
 		render(GameMap);
+		cout << "Render ended, took " << SDL_GetTicks() - TaskTime << "ms" << endl;
 		SDL_GetMouseState(&mouseX, &mouseY); // Check mouse position
 		if (SDL_PollEvent(&event) && event.type == SDL_EVENT_QUIT)
 			break;
