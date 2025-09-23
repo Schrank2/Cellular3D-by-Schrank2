@@ -10,6 +10,7 @@ SDL_Texture* cellTexture;
 int StartTime;
 int CurrentTime;
 float TaskTime;
+float FrameTime;
 int LastTime;
 int CameraX = 0;
 int CameraY = 0;
@@ -83,6 +84,9 @@ int game() {
 	// The Game Loop
 	while (1) {
 		CurrentTime = SDL_GetTicks() - StartTime;
+		FrameTime += SDL_GetTicks() - CurrentTime;
+		cout << "\rFPS: " << 1000.0f / FrameTime << "   FrameTime: " << FrameTime << "ms                   ";
+		FrameTime = 0;
 		if (CurrentTime - LastTime >= TickTime && Pause == 0) {
 			if (Debug == true) { cout << "Tick started" << endl; TaskTime = SDL_GetTicks();}
 			LastTime = CurrentTime;
