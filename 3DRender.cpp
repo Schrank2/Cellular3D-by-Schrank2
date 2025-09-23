@@ -7,6 +7,7 @@ using namespace std;
 #include <string>
 #include <thread>
 #include <mutex>
+#include <algorithm>
 
 mutex renderLock;
 vector<thread> RenderThreads;
@@ -37,7 +38,9 @@ vector<Triangle> TriangleQueue; // Queue for Triangles
 
 // Adding all Voxels to a list.
 std::vector<Voxel> VoxelQueue;
-void readVoxels(const std::vector<std::vector<std::vector<int>>>& GameMap) {
+static void readVoxels(const std::vector<std::vector<std::vector<int>>>& GameMap) {
+	float ReadTime;
+	if (Debug == true) { cout << "ReadVoxels started" << endl; ReadTime = SDL_GetTicks(); }
 	// Clear the VoxelQueue
 	VoxelQueue.clear();
 	for (int i = 0; i < GameWidth; i++) {
@@ -56,6 +59,7 @@ void readVoxels(const std::vector<std::vector<std::vector<int>>>& GameMap) {
 			}
 		}
 	}
+	if (Debug == true) { cout << "ReadVoxels ended, took " << SDL_GetTicks() - ReadTime << "ms" << endl; }
 }
 static float ScreenCoordinateX(float x, float z) {
 	float Depth = 1 + (0.03f * z); // Adjusting depth for perspective
@@ -138,11 +142,17 @@ void renderThread(int Thread, int yMin, int yMax) {
 	}
 }
 void render3D() {
+	float render3DTime;
 	readVoxels(GameMap);
+
+	if (Debug == true) { cout << "Rendervoxel started" << endl; render3DTime = SDL_GetTicks(); }
 	for (int i = 0; i < VoxelQueue.size(); i++) {
 		renderVoxel(VoxelQueue[i]);
 	}
+	if (Debug == true) { cout << "ReadVoxels ended, took " << SDL_GetTicks() - render3DTime << "ms" << endl; }
+
 	// Rendering Multithreaded
+	if (Debug == true) { cout << "Rectangles started" << endl; render3DTime = SDL_GetTicks(); }
 	RenderThreads.clear();
 	int rowLength = GameHeight / ThreadCountUsed;
 	for (int i = 0; i < ThreadCountUsed; i++) {
@@ -153,22 +163,15 @@ void render3D() {
 
 	}
 	for (auto& th : RenderThreads) { th.join(); }; // Wait for the Rectangles to be calculated
+	if (Debug == true) { cout << "Rectangles ended, took " << SDL_GetTicks() - render3DTime << "ms" << endl; }
 	// Sort the Triangles by Depth
-	int comparison = 0;
-	int i, j, s;
-	Triangle tempTriangle = TriangleQueue[0]; // Temporary Variable for Swapping
-	for (i = 0; i < TriangleQueue.size() - 1; i++) { // Durch die Liste Iterieren
-		s = i; // Den Speicher auf die Ersten Position der Liste setzen.
-		for (j = i; j < TriangleQueue.size(); j++) { // Ab dem Punkt in den der Erste Loop iteriert, alle restlichen Durchiterieren
-			comparison = comparison + 1; // Counter um die Menge an Vergleichen zu zählen.
-			if ((TriangleQueue[s].A.z + TriangleQueue[s].B.z + TriangleQueue[s].C.z) < (TriangleQueue[j].A.z + TriangleQueue[j].B.z + TriangleQueue[j].C.z)) { // Vergleichen zwischen dem Wert der Gespeicherten Position und dem vom 2. Loop iterierten Wert.
-				s = j; // Speichern des 2.Loop-Werts, falls dieser größer als der bisherige Speicher ist.
-			}
-		}
-		tempTriangle = TriangleQueue[s]; // Finales Tauschen des Zwischenspeichers mit dem ersten des zu bearbeitenden Bereich
-		TriangleQueue[s] = TriangleQueue[i];
-		TriangleQueue[i] = tempTriangle;
-	};
+	if (Debug == true) { cout << "Depth sorting started" << endl; render3DTime = SDL_GetTicks(); }
+	std::sort(TriangleQueue.begin(), TriangleQueue.end(), [](const Triangle& a, const Triangle& b) {
+		float zA = (a.A.z + a.B.z + a.C.z) / 3.0f; // Average Z value of triangle A
+		float zB = (b.A.z + b.B.z + b.C.z) / 3.0f; // Average Z value of triangle B
+		return zA > zB; // Sort in descending order (farthest first)
+		});
+	if (Debug == true) { cout << "Depth Sorting ended, took " << SDL_GetTicks() - render3DTime << "ms" << endl; }
 	// Render all Triangles
 	for (int i = 0; i < TriangleQueue.size(); i++) {
 		DrawTriangle(TriangleQueue[i]);
