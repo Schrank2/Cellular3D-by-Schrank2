@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
 	ThreadCountUsed = ThreadCount * ThreadCountUsage;
 	GameMap.resize(GameWidth, vector<vector<int>>(GameHeight, vector<int>(GameDepth)));
 	GameMapNext.resize(GameWidth, vector<vector<int>>(GameHeight, vector<int>(GameDepth)));
-	if (Debug = true) { cout << "Successfully Read Settings" << endl; }
+	if (Debug == true) { cout << "Successfully Read Settings" << endl; }
 	if (SDL_Init( SDL_INIT_VIDEO or SDL_INIT_AUDIO) < 0)
 	{
 		cout << "SDL initialization failed. SDL Error: " << SDL_GetError();
