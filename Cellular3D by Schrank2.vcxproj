@@ -84,8 +84,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="3DRender.cpp" />
-    <ClCompile Include="Game.cpp" />
-    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="loop.cpp" />
+    <ClCompile Include="init.cpp" />
     <ClCompile Include="readsettings.cpp" />
     <ClCompile Include="render.cpp" />
   </ItemGroup>

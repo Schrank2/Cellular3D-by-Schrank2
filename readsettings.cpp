@@ -51,7 +51,7 @@ vector<string> readSettings() {
 			Variables[3] = value;
 		} else if (key == "ThreadCountUsage") {
 			Variables[4] = value;
-		} else if (key == "TickTime") {
+		} else if (key == "TickInterval") {
 			Variables[5] = value;
 		} else if (key == "Debug") {
 			Variables[6] = value;

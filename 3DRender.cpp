@@ -38,9 +38,8 @@ vector<Triangle> TriangleQueue; // Queue for Triangles
 
 // Adding all Voxels to a list.
 std::vector<Voxel> VoxelQueue;
-static void readVoxels(const std::vector<std::vector<std::vector<int>>>& GameMap) {
-	float ReadTime;
-	if (Debug == true) { cout << "ReadVoxels started" << endl; ReadTime = SDL_GetTicks(); }
+inline static void readVoxels(const std::vector<std::vector<std::vector<int>>>& GameMap) {
+	if (Debug == true) {ReadVoxelTime = SDL_GetTicks();}
 	// Clear the VoxelQueue
 	VoxelQueue.clear();
 	for (int i = 0; i < GameWidth; i++) {
@@ -59,19 +58,19 @@ static void readVoxels(const std::vector<std::vector<std::vector<int>>>& GameMap
 			}
 		}
 	}
-	if (Debug == true) { cout << "ReadVoxels ended, took " << SDL_GetTicks() - ReadTime << "ms" << endl; }
+	if (Debug == true) {ReadVoxelTime = SDL_GetTicks() - ReadVoxelTime; }
 }
-static float ScreenCoordinateX(float x, float z) {
+inline static float ScreenCoordinateX(float x, float z) {
 	float Depth = 1 + (0.03f * z); // Adjusting depth for perspective
 	float scale = ScreenWidth / static_cast<float>(GameWidth);
 	return (x / Depth) * scale;
 }
-static float ScreenCoordinateY(float y, float z) {
+inline static float ScreenCoordinateY(float y, float z) {
 	float Depth = 1+ (0.03f * z); // Adjusting depth for perspective
 	float scale = ScreenHeight / static_cast<float>(GameHeight);
 	return (y / Depth) * scale;
 }
-void renderVoxel(Voxel V) {
+inline void renderVoxel(Voxel V) {
 	//cout << "Rendering Voxel at (" << V.position.x << ", " << V.position.y << ", " << V.position.z << ") with color (" << V.color.r << ", " << V.color.g << ", " << V.color.b << ", " << V.color.a << ")" << endl;
 	vector<Triangle> Triangles;
 	// Front Face
@@ -109,7 +108,7 @@ void renderVoxel(Voxel V) {
 		TriangleQueue.emplace_back(Triangles[i]);
 	}
 };
-static void DrawTriangle(Triangle T) {
+inline static void DrawTriangle(Triangle T) {
 	vector<SDL_Vertex> vertices(3);
 	SDL_FPoint A = { ScreenCoordinateX(T.A.x,T.A.z),ScreenCoordinateY(T.A.y,T.A.z)};
 	SDL_FPoint B = { ScreenCoordinateX(T.B.x,T.B.z),ScreenCoordinateY(T.B.y,T.B.z)};
@@ -118,7 +117,8 @@ static void DrawTriangle(Triangle T) {
 	vertices[1].position = B;
 	vertices[2].position = C;
 	// Set the color of the vertices
-	float c = min(T.A.z, min(T.B.z, T.C.z));
+	float c = (T.A.z + T.B.z + T.C.z) / 3.0f; // Average Z value of the triangle
+	//float c = min(T.A.z, min(T.B.z, T.C.z)); // alternate minimum Z value of the triangle
 	if (c != 0.0f) { // Avoid division by zero
 		c = 1 / c;
 	} else {
@@ -134,7 +134,7 @@ static void DrawTriangle(Triangle T) {
 	SDL_RenderGeometry(renderer, nullptr, vertices.data(), vertices.size(), nullptr, 0);
 }
 
-void renderThread(int Thread, int yMin, int yMax) {
+inline void renderThread(int Thread, int yMin, int yMax) {
 	for (int i = yMin; i < yMax; i++) {
 		renderLock.lock(); // Used to avoid Deadlock Issue
 		renderVoxel(VoxelQueue[i]);
@@ -142,17 +142,15 @@ void renderThread(int Thread, int yMin, int yMax) {
 	}
 }
 void render3D() {
-	float render3DTime;
 	readVoxels(GameMap);
-
-	if (Debug == true) { cout << "Rendervoxel started" << endl; render3DTime = SDL_GetTicks(); }
+	if (Debug == true) {RenderVoxelTime = SDL_GetTicks();}
 	for (int i = 0; i < VoxelQueue.size(); i++) {
 		renderVoxel(VoxelQueue[i]);
 	}
-	if (Debug == true) { cout << "ReadVoxels ended, took " << SDL_GetTicks() - render3DTime << "ms" << endl; }
+	if (Debug == true) {RenderVoxelTime = SDL_GetTicks() - RenderVoxelTime;}
 
 	// Rendering Multithreaded
-	if (Debug == true) { cout << "Rectangles started" << endl; render3DTime = SDL_GetTicks(); }
+	if (Debug == true) {RenderRectangleTime = SDL_GetTicks();}
 	RenderThreads.clear();
 	int rowLength = GameHeight / ThreadCountUsed;
 	for (int i = 0; i < ThreadCountUsed; i++) {
@@ -163,18 +161,20 @@ void render3D() {
 
 	}
 	for (auto& th : RenderThreads) { th.join(); }; // Wait for the Rectangles to be calculated
-	if (Debug == true) { cout << "Rectangles ended, took " << SDL_GetTicks() - render3DTime << "ms" << endl; }
+	if (Debug == true) {RenderRectangleTime = SDL_GetTicks() - RenderRectangleTime;}
 	// Sort the Triangles by Depth
-	if (Debug == true) { cout << "Depth sorting started" << endl; render3DTime = SDL_GetTicks(); }
+	if (Debug == true) {DepthSortTime = SDL_GetTicks(); }
 	std::sort(TriangleQueue.begin(), TriangleQueue.end(), [](const Triangle& a, const Triangle& b) {
 		float zA = (a.A.z + a.B.z + a.C.z) / 3.0f; // Average Z value of triangle A
 		float zB = (b.A.z + b.B.z + b.C.z) / 3.0f; // Average Z value of triangle B
 		return zA > zB; // Sort in descending order (farthest first)
 		});
-	if (Debug == true) { cout << "Depth Sorting ended, took " << SDL_GetTicks() - render3DTime << "ms" << endl; }
+	if (Debug == true) {DepthSortTime = SDL_GetTicks() - DepthSortTime; }
 	// Render all Triangles
+	if (Debug == true) { DrawTime = SDL_GetTicks();}
 	for (int i = 0; i < TriangleQueue.size(); i++) {
 		DrawTriangle(TriangleQueue[i]);
 	}
 	TriangleQueue.clear(); // Clear the Triangle Queue after rendering
+	if (Debug == true) { DrawTime = SDL_GetTicks() - DrawTime; }
 }

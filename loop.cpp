@@ -11,6 +11,8 @@ int StartTime;
 int CurrentTime;
 float TaskTime;
 float FrameTime;
+float TickTime;
+float InputTime;
 int LastTime;
 int CameraX = 0;
 int CameraY = 0;
@@ -26,7 +28,7 @@ const int neighborOffsets[8][2] = {
 	{-1,  1}, {0,  1}, {1,  1}
 };
 std::vector<thread> threads;
-static void CellularAutomataRules(int txMin,int txMax,int tyMin, int tyMax) {
+inline static void CellularAutomataRules(int txMin,int txMax,int tyMin, int tyMax) {
 	// Cellular Automata do stuff now
 	int survive; int neighbors;
 	for (int i = txMin; i < txMax; i++) {
@@ -84,11 +86,9 @@ int game() {
 	// The Game Loop
 	while (1) {
 		CurrentTime = SDL_GetTicks() - StartTime;
-		FrameTime += SDL_GetTicks() - CurrentTime;
-		cout << "\rFPS: " << 1000.0f / FrameTime << "   FrameTime: " << FrameTime << "ms                   ";
-		FrameTime = 0;
-		if (CurrentTime - LastTime >= TickTime && Pause == 0) {
-			if (Debug == true) { cout << "Tick started" << endl; TaskTime = SDL_GetTicks();}
+		FrameTime = SDL_GetTicks();
+		if (CurrentTime - LastTime >= TickInterval && Pause == 0) {
+			if (Debug == true) {TickTime = SDL_GetTicks();}
 			LastTime = CurrentTime;
 			// emptying GameMapNext
 			for (auto& row : GameMapNext) {
@@ -107,11 +107,12 @@ int game() {
 			for (auto& th : threads) { th.join(); };
 			// Apply Changes
 			std::swap(GameMap, GameMapNext); // Basically GameMap = GameMapNext; but Copilot says it's faster lol
-			if (Debug == true) { cout << "Tick ended, took " << SDL_GetTicks() - TaskTime << "ms" << endl; }
+			if (Debug == true) { TickTime = SDL_GetTicks() - TickTime; }
 		}
-		if (Debug == true) { cout << "Render started" << endl; TaskTime = SDL_GetTicks();}
+		if (Debug == true) { RenderTime = SDL_GetTicks(); }
 		render(GameMap);
-		if (Debug == true) { cout << "Render ended, took " << SDL_GetTicks() - TaskTime << "ms" << endl; }
+		if (Debug == true) { RenderTime = SDL_GetTicks() - RenderTime; }
+		if (Debug == true) {InputTime = SDL_GetTicks(); }
 		SDL_GetMouseState(&mouseX, &mouseY); // Check mouse position
 		if (SDL_PollEvent(&event) && event.type == SDL_EVENT_QUIT)
 			break;
@@ -129,6 +130,11 @@ int game() {
 				Pause = !Pause;
 			}
 		}
+		if (Debug == true) { InputTime = SDL_GetTicks() - InputTime; }
+		FrameTime = SDL_GetTicks() - FrameTime;
+		if (Debug == true) { cout << "----------------------------------------" << endl; }
+		if (Debug == true) { cout << "FPS: " << 1000.0f / FrameTime << "   FrameTime: " << FrameTime << "ms" << "   Rendering: " << RenderTime << "ms" << "   Voxels: " << RenderVoxelTime << "ms" << "   Rectangles: " << RenderRectangleTime << "ms" << "   RenderInit: " << RenderInitTime << "ms" << "   RenderPresent: " << RenderPresentTime << "ms" << endl; };
+		if (Debug == true) { cout << "TickTime: " << TickTime << "ms" << "   ReadVoxels: " << ReadVoxelTime << "ms" << "   DepthSorting: " << DepthSortTime << "ms" << "   Drawing: " << DrawTime << "ms" << "   InputTime: " << InputTime << "ms" << endl; };
 	}
 	// Cleanup
 	return 0;

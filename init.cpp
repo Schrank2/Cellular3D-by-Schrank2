@@ -12,7 +12,7 @@ float mapDensity;
 int ScreenWidth;
 int ScreenHeight;
 float ThreadCountUsage;
-int TickTime;
+int TickInterval;
 bool Debug;
 int GameWidth;
 int GameHeight;
@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 	ScreenWidth = stoi(settings[2]); // The width of the game window in pixels
 	ScreenHeight = stoi(settings[3]); // The height of the game window in pixels
 	ThreadCountUsage = stof(settings[4]); // The percentage of CPU threads to use for the game
-	TickTime = stoi(settings[5]); // Time between game ticks in milliseconds
+	TickInterval = stoi(settings[5]); // Time between game ticks in milliseconds
 	if (settings[6] == "true") { Debug = true; }; // Should debug messages be printed to the console
 	GameWidth = ScreenWidth / GameScale;
 	GameHeight = ScreenHeight / GameScale;
