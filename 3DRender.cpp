@@ -12,7 +12,6 @@ using namespace std;
 mutex renderLock;
 vector<thread> RenderThreads;
 
-
 // Declaring the "Data Type" Voxel
 struct POS3D {
 	// Defining Components
@@ -108,6 +107,11 @@ inline void renderVoxel(Voxel V) {
 		TriangleQueue.emplace_back(Triangles[i]);
 	}
 };
+inline static float GetDepthDark(float A) {
+	A = shadingStrength * A + 1.0f;
+	A = 1 / A;
+	return A;
+}
 inline static void DrawTriangle(Triangle T) {
 	vector<SDL_Vertex> vertices(3);
 	SDL_FPoint A = { ScreenCoordinateX(T.A.x,T.A.z),ScreenCoordinateY(T.A.y,T.A.z)};
@@ -116,18 +120,14 @@ inline static void DrawTriangle(Triangle T) {
 	vertices[0].position = A;
 	vertices[1].position = B;
 	vertices[2].position = C;
-	// Set the color of the vertices
-	//float c = (T.A.z + T.B.z + T.C.z) / 3.0f; // alternate Average Z value of the triangle
-	float c = 1+0.25*max(T.A.z, max(T.B.z, T.C.z)); //minimum Z value of the triangle
-	if (c != 0.0f) { // Avoid division by zero
-		c = 1 / c;
-	} else {
-		c = 1.0f;
-	}
-	SDL_FColor Color = { T.color.r * c,T.color.g * c,T.color.b * c,T.color.a };
-	vertices[0].color = Color;
-	vertices[1].color = Color;
-	vertices[2].color = Color;
+	//float m = (T.A.z + T.B.z + T.C.z) / 3.0f; // alternate Average Z value of the triangle
+	//float m = 1+0.25*max(T.A.z, max(T.B.z, T.C.z)); //minimum Z value of the triangle
+	float c = GetDepthDark(T.A.z);
+	vertices[0].color = { T.color.r * c,T.color.g * c,T.color.b * c,T.color.a };
+	c = GetDepthDark(T.B.z);
+	vertices[1].color = { T.color.r * c,T.color.g * c,T.color.b * c,T.color.a };
+	c = GetDepthDark(T.C.z);
+	vertices[2].color = { T.color.r * c,T.color.g * c,T.color.b * c,T.color.a };
 	vertices[0].tex_coord = { 0.0f, 0.0f };
 	vertices[1].tex_coord = { 0.0f, 0.0f };
 	vertices[2].tex_coord = { 0.0f, 0.0f };

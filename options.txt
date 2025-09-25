@@ -13,3 +13,5 @@ ThreadCountUsage=1.0
 TickInterval=1
 # Should debug messages be printed to the console
 Debug=true
+# How strong should the shading be?
+shadingStrength=0.15

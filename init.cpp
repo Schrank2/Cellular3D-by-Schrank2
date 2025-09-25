@@ -12,6 +12,7 @@ float mapDensity;
 int ScreenWidth;
 int ScreenHeight;
 float ThreadCountUsage;
+float shadingStrength; // Strength of the shading based on depth
 int TickInterval;
 bool Debug;
 int GameWidth;
@@ -35,6 +36,8 @@ int main(int argc, char* argv[])
 	ThreadCountUsage = stof(settings[4]); // The percentage of CPU threads to use for the game
 	TickInterval = stoi(settings[5]); // Time between game ticks in milliseconds
 	if (settings[6] == "true") { Debug = true; }; // Should debug messages be printed to the console
+	shadingStrength = stof(settings[7]); // The percentage of CPU threads to use for the game
+	//
 	GameWidth = ScreenWidth / GameScale;
 	GameHeight = ScreenHeight / GameScale;
 	GameDepth = GameHeight; // The depth of the game map, can be used for 3D rendering

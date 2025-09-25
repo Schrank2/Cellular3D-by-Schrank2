@@ -42,4 +42,5 @@ extern int ScreenHeight; // The height of the game window in pixels
 extern float ThreadCountUsage; // The percentage of CPU threads to use for the game
 extern int TickInterval; // Time between game ticks in milliseconds
 extern bool Debug; // Should debug messages be printed to the console
+extern float shadingStrength; // Strength of the shading based on depth
 #endif
