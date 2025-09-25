@@ -8,6 +8,7 @@ using namespace std;
 #include <thread>
 #include <mutex>
 #include <algorithm>
+#include <tuple>
 
 mutex renderLock;
 vector<thread> RenderThreads;
@@ -114,12 +115,9 @@ inline static float GetDepthDark(float A) {
 }
 inline static bool DrawTriangle(Triangle T) {
 	vector<SDL_Vertex> vertices(3);
-	SDL_FPoint A = { ScreenCoordinateX(T.A.x,T.A.z),ScreenCoordinateY(T.A.y,T.A.z)};
-	SDL_FPoint B = { ScreenCoordinateX(T.B.x,T.B.z),ScreenCoordinateY(T.B.y,T.B.z)};
-	SDL_FPoint C = { ScreenCoordinateX(T.C.x,T.C.z),ScreenCoordinateY(T.C.y,T.C.z)};
-	vertices[0].position = A;
-	vertices[1].position = B;
-	vertices[2].position = C;
+	SDL_FPoint A = {ScreenCoordinateX(T.A.x,T.A.z),ScreenCoordinateY(T.A.y,T.A.z)};
+	SDL_FPoint B = {ScreenCoordinateX(T.B.x,T.B.z),ScreenCoordinateY(T.B.y,T.B.z)};
+	SDL_FPoint C = {ScreenCoordinateX(T.C.x,T.C.z),ScreenCoordinateY(T.C.y,T.C.z)};
 	//float m = (T.A.z + T.B.z + T.C.z) / 3.0f; // alternate Average Z value of the triangle
 	//float m = 1+0.25*max(T.A.z, max(T.B.z, T.C.z)); //minimum Z value of the triangle
 	float c = GetDepthDark(T.A.z);
@@ -128,33 +126,45 @@ inline static bool DrawTriangle(Triangle T) {
 	vertices[1].color = { T.color.r * c,T.color.g * c,T.color.b * c,T.color.a };
 	c = GetDepthDark(T.C.z);
 	vertices[2].color = { T.color.r * c,T.color.g * c,T.color.b * c,T.color.a };
-	vertices[0].tex_coord = { 0.0f, 0.0f };
-	vertices[1].tex_coord = { 0.0f, 0.0f };
-	vertices[2].tex_coord = { 0.0f, 0.0f };
 	// Setup the Texture
+	int maxX = static_cast<int>(max(A.x, max(B.x, C.x)));
+	int maxY = static_cast<int>(max(A.y, max(B.y, C.y)));
+	int minX = static_cast<int>(min(A.x, min(B.x, C.x)));
+	int minY = static_cast<int>(min(A.y, min(B.y, C.y)));
+	int TextureWidth = ceil(maxX-minX);
+	if (TextureWidth <= 0) {return false;} // Avoiding issues with 0 width textures
+	int TextureHeight = ceil(maxY-minY);
+	if (TextureHeight <= 0) {return false;} // Avoiding issues with 0 width textures
 	SDL_Texture* Texture = SDL_CreateTexture(
 		renderer,
 		SDL_PIXELFORMAT_RGBA32,
 		SDL_TEXTUREACCESS_TARGET,
-		min(A.x,min(B.x,C.x)),
-		min(A.y, min(B.y, C.y))
+		TextureWidth,
+		TextureHeight
 	);
 	// Check if successful
 	if (!Texture) {
-		std::cerr << "Failed to create cell texture: " << SDL_GetError() << std::endl;
+		std::cerr << "Failed to create polygon texture: " << SDL_GetError() << std::endl;
 		return false;
 	}
-	// Save current render target
-	SDL_Texture* prevTarget = SDL_GetRenderTarget(renderer);
 	// Set Texture as render target
+	SDL_Texture* prevTarget = SDL_GetRenderTarget(renderer);
 	SDL_SetRenderTarget(renderer, Texture);
-	// Clear the texture
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-	SDL_RenderClear(renderer);
+	vertices[0].position = { A.x - minX, A.y - minY };
+	vertices[1].position = { B.x - minX, B.y - minY };
+	vertices[2].position = { C.x - minX, C.y - minY };
+	vertices[0].tex_coord = { 0.0f, 0.0f };
+	vertices[1].tex_coord = { 0.0f, 0.0f };
+	vertices[2].tex_coord = { 0.0f, 0.0f };
 	// Draw the texture
-	SDL_RenderGeometry(renderer, nullptr, vertices.data(), vertices.size(), nullptr, 0);
+	SDL_RenderGeometry(renderer, nullptr, vertices.data(), 3, nullptr, 0);
 	// Draw the Texture to the main renderer
 	SDL_SetRenderTarget(renderer, prevTarget);
+	SDL_FRect rect = {minX ,minY ,TextureWidth,TextureHeight };
+	//cout << "Drawing Triangle at (" << minX << ", " << minY << ") with size (" << TextureWidth << ", " << TextureHeight << ")" << endl;
+	SDL_RenderTexture(renderer, Texture, nullptr, &rect);
+	// Clean up
+	SDL_DestroyTexture(Texture);
 	return true;
 }
 
