@@ -112,7 +112,7 @@ inline static float GetDepthDark(float A) {
 	A = 1 / A;
 	return A;
 }
-inline static void DrawTriangle(Triangle T) {
+inline static bool DrawTriangle(Triangle T) {
 	vector<SDL_Vertex> vertices(3);
 	SDL_FPoint A = { ScreenCoordinateX(T.A.x,T.A.z),ScreenCoordinateY(T.A.y,T.A.z)};
 	SDL_FPoint B = { ScreenCoordinateX(T.B.x,T.B.z),ScreenCoordinateY(T.B.y,T.B.z)};
@@ -131,7 +131,31 @@ inline static void DrawTriangle(Triangle T) {
 	vertices[0].tex_coord = { 0.0f, 0.0f };
 	vertices[1].tex_coord = { 0.0f, 0.0f };
 	vertices[2].tex_coord = { 0.0f, 0.0f };
+	// Setup the Texture
+	SDL_Texture* Texture = SDL_CreateTexture(
+		renderer,
+		SDL_PIXELFORMAT_RGBA32,
+		SDL_TEXTUREACCESS_TARGET,
+		min(A.x,min(B.x,C.x)),
+		min(A.y, min(B.y, C.y))
+	);
+	// Check if successful
+	if (!Texture) {
+		std::cerr << "Failed to create cell texture: " << SDL_GetError() << std::endl;
+		return false;
+	}
+	// Save current render target
+	SDL_Texture* prevTarget = SDL_GetRenderTarget(renderer);
+	// Set Texture as render target
+	SDL_SetRenderTarget(renderer, Texture);
+	// Clear the texture
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_RenderClear(renderer);
+	// Draw the texture
 	SDL_RenderGeometry(renderer, nullptr, vertices.data(), vertices.size(), nullptr, 0);
+	// Draw the Texture to the main renderer
+	SDL_SetRenderTarget(renderer, prevTarget);
+	return true;
 }
 
 inline void renderThread(int Thread, int yMin, int yMax) {
