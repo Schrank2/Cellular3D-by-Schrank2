@@ -12,6 +12,14 @@ using namespace std;
 
 mutex renderLock;
 vector<thread> RenderThreads;
+struct TEXTUREMETA {
+	// Defining Components
+	SDL_Texture* texture;
+	SDL_FRect rect;
+	// Defining Constructor
+	TEXTUREMETA(SDL_Texture* texture, SDL_FRect rect) : texture(texture), rect(rect) {}
+};
+vector<TEXTUREMETA> TriangleTextures;
 
 // Declaring the "Data Type" Voxel
 struct POS3D {
@@ -70,7 +78,7 @@ inline static float ScreenCoordinateY(float y, float z) {
 	float scale = ScreenHeight / static_cast<float>(GameHeight);
 	return (y / Depth) * scale;
 }
-inline void renderVoxel(Voxel V) {
+inline static void renderVoxel(Voxel V) {
 	//cout << "Rendering Voxel at (" << V.position.x << ", " << V.position.y << ", " << V.position.z << ") with color (" << V.color.r << ", " << V.color.g << ", " << V.color.b << ", " << V.color.a << ")" << endl;
 	vector<Triangle> Triangles;
 	// Front Face
@@ -93,7 +101,7 @@ inline void renderVoxel(Voxel V) {
 	Triangles.emplace_back(Triangle{{1,0,0},{1,1,1},{1,0,1},{1.0f,0.0f,1.0f,1.0f}});
 
 	
-	// The Loop for Drawing Triangles
+	// The Loop for Offsetting Triangles
 	for (int i = 0; i < Triangles.size(); i++) {
 		// Adjusting the position of the triangle based on the voxel position
 		Triangles[i].A.x += V.position.x;
@@ -127,14 +135,14 @@ inline static bool DrawTriangle(Triangle T) {
 	c = GetDepthDark(T.C.z);
 	vertices[2].color = { T.color.r * c,T.color.g * c,T.color.b * c,T.color.a };
 	// Setup the Texture
-	int maxX = static_cast<int>(max(A.x, max(B.x, C.x)));
-	int maxY = static_cast<int>(max(A.y, max(B.y, C.y)));
-	int minX = static_cast<int>(min(A.x, min(B.x, C.x)));
-	int minY = static_cast<int>(min(A.y, min(B.y, C.y)));
-	int TextureWidth = ceil(maxX-minX);
-	if (TextureWidth <= 0) {return false;} // Avoiding issues with 0 width textures
-	int TextureHeight = ceil(maxY-minY);
-	if (TextureHeight <= 0) {return false;} // Avoiding issues with 0 width textures
+	float maxX = ceil(max({A.x,B.x,C.x}));
+	float maxY = ceil(max({A.y,B.y,C.y}));
+	float minX = floor(min({A.x,B.x,C.x}));
+	float minY = floor(min({A.y,B.y,C.y}));
+	float TextureWidth = maxX-minX;
+	if (TextureWidth < 1) {return false;} // Avoiding issues with 0 width textures
+	float TextureHeight = maxY-minY;
+	if (TextureHeight < 1) {return false;} // Avoiding issues with 0 width textures
 	SDL_Texture* Texture = SDL_CreateTexture(
 		renderer,
 		SDL_PIXELFORMAT_RGBA32,
@@ -150,6 +158,7 @@ inline static bool DrawTriangle(Triangle T) {
 	// Set Texture as render target
 	SDL_Texture* prevTarget = SDL_GetRenderTarget(renderer);
 	SDL_SetRenderTarget(renderer, Texture);
+
 	vertices[0].position = { A.x - minX, A.y - minY };
 	vertices[1].position = { B.x - minX, B.y - minY };
 	vertices[2].position = { C.x - minX, C.y - minY };
@@ -158,17 +167,13 @@ inline static bool DrawTriangle(Triangle T) {
 	vertices[2].tex_coord = { 0.0f, 0.0f };
 	// Draw the texture
 	SDL_RenderGeometry(renderer, nullptr, vertices.data(), 3, nullptr, 0);
-	// Draw the Texture to the main renderer
-	SDL_SetRenderTarget(renderer, prevTarget);
-	SDL_FRect rect = {minX ,minY ,TextureWidth,TextureHeight };
-	//cout << "Drawing Triangle at (" << minX << ", " << minY << ") with size (" << TextureWidth << ", " << TextureHeight << ")" << endl;
-	SDL_RenderTexture(renderer, Texture, nullptr, &rect);
-	// Clean up
-	SDL_DestroyTexture(Texture);
+	// Add to Texture list
+	SDL_FRect rect = { minX,minY,maxX,maxY };
+	TriangleTextures.emplace_back(TEXTUREMETA(Texture,rect));
 	return true;
 }
 
-inline void renderThread(int Thread, int yMin, int yMax) {
+static void renderThread(int Thread, int yMin, int yMax) {
 	for (int i = yMin; i < yMax; i++) {
 		renderLock.lock(); // Used to avoid Deadlock Issue
 		renderVoxel(VoxelQueue[i]);
@@ -211,4 +216,11 @@ void render3D() {
 	}
 	TriangleQueue.clear(); // Clear the Triangle Queue after rendering
 	if (Debug == true) { DrawTime = SDL_GetTicks() - DrawTime; }
+	// Present all Textures
+	SDL_SetRenderTarget(renderer, nullptr);
+	for (int i = 0; i < TriangleTextures.size(); i++) {
+		SDL_Texture* Texture = TriangleTextures[i].texture;
+		SDL_FRect rect = TriangleTextures[i].rect;
+		SDL_RenderTexture(renderer, Texture, nullptr, &rect);
+	}
 }
