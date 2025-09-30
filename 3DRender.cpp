@@ -168,7 +168,7 @@ inline static bool DrawTriangle(Triangle T) {
 	// Draw the texture
 	SDL_RenderGeometry(renderer, nullptr, vertices.data(), 3, nullptr, 0);
 	// Add to Texture list
-	SDL_FRect rect = { minX,minY,maxX,maxY };
+	SDL_FRect rect = { minX ,minY ,TextureWidth,TextureHeight };
 	TriangleTextures.emplace_back(TEXTUREMETA(Texture,rect));
 	return true;
 }
