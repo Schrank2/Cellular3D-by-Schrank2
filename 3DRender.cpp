@@ -223,4 +223,9 @@ void render3D() {
 		SDL_FRect rect = TriangleTextures[i].rect;
 		SDL_RenderTexture(renderer, Texture, nullptr, &rect);
 	}
+	// TriangleTextures are deleted in the end of the frame to avoid memory leaks
+	for (auto& meta : TriangleTextures) {
+		SDL_DestroyTexture(meta.texture);
+	}
+	TriangleTextures.clear();
 }

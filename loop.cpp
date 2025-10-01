@@ -6,7 +6,6 @@
 #include "functions.h"
 #include <thread>
 using namespace std;
-SDL_Texture* cellTexture;
 int StartTime;
 int CurrentTime;
 float TaskTime;
@@ -81,8 +80,6 @@ int game() {
 			}
 		}
 	}
-	// Generating the Textures
-	cellTexture=genCellTexture();
 	// The Game Loop
 	while (1) {
 		CurrentTime = SDL_GetTicks() - StartTime;

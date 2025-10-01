@@ -31,7 +31,6 @@ extern float InputTime;
 extern SDL_Window* window;
 extern SDL_Renderer* renderer;
 extern SDL_Event event;
-extern SDL_Texture* cellTexture;
 extern std::vector<std::vector<std::vector<int>>> GameMap;
 extern std::vector<std::vector<std::vector<int>>> GameMapNext;
 // Settings
