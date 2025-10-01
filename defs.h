@@ -29,6 +29,7 @@ extern float DrawTime;
 extern float InputTime;
 
 extern SDL_Window* window;
+extern SDL_Texture* supersampleTex;
 extern SDL_Renderer* renderer;
 extern SDL_Event event;
 extern std::vector<std::vector<std::vector<int>>> GameMap;
@@ -42,4 +43,5 @@ extern float ThreadCountUsage; // The percentage of CPU threads to use for the g
 extern int TickInterval; // Time between game ticks in milliseconds
 extern bool Debug; // Should debug messages be printed to the console
 extern float shadingStrength; // Strength of the shading based on depth
+extern int AAScale; // Antialiasing strength, 1 = none, 2 = 2x, 3 = 3x, 4 = 4x
 #endif

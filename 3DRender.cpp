@@ -9,7 +9,6 @@ using namespace std;
 #include <mutex>
 #include <algorithm>
 #include <tuple>
-
 mutex renderLock;
 vector<thread> RenderThreads;
 struct TEXTUREMETA {
@@ -123,53 +122,18 @@ inline static float GetDepthDark(float A) {
 }
 inline static bool DrawTriangle(Triangle T) {
 	vector<SDL_Vertex> vertices(3);
-	SDL_FPoint A = {ScreenCoordinateX(T.A.x,T.A.z),ScreenCoordinateY(T.A.y,T.A.z)};
-	SDL_FPoint B = {ScreenCoordinateX(T.B.x,T.B.z),ScreenCoordinateY(T.B.y,T.B.z)};
-	SDL_FPoint C = {ScreenCoordinateX(T.C.x,T.C.z),ScreenCoordinateY(T.C.y,T.C.z)};
-	//float m = (T.A.z + T.B.z + T.C.z) / 3.0f; // alternate Average Z value of the triangle
-	//float m = 1+0.25*max(T.A.z, max(T.B.z, T.C.z)); //minimum Z value of the triangle
+	SDL_FPoint A = {AAScale*ScreenCoordinateX(T.A.x,T.A.z), AAScale*ScreenCoordinateY(T.A.y,T.A.z)};
+	SDL_FPoint B = {AAScale*ScreenCoordinateX(T.B.x,T.B.z), AAScale*ScreenCoordinateY(T.B.y,T.B.z)};
+	SDL_FPoint C = {AAScale*ScreenCoordinateX(T.C.x,T.C.z), AAScale*ScreenCoordinateY(T.C.y,T.C.z)};
 	float c = GetDepthDark(T.A.z);
 	vertices[0].color = { T.color.r * c,T.color.g * c,T.color.b * c,T.color.a };
 	c = GetDepthDark(T.B.z);
 	vertices[1].color = { T.color.r * c,T.color.g * c,T.color.b * c,T.color.a };
 	c = GetDepthDark(T.C.z);
 	vertices[2].color = { T.color.r * c,T.color.g * c,T.color.b * c,T.color.a };
-	// Setup the Texture
-	float maxX = ceil(max({A.x,B.x,C.x}));
-	float maxY = ceil(max({A.y,B.y,C.y}));
-	float minX = floor(min({A.x,B.x,C.x}));
-	float minY = floor(min({A.y,B.y,C.y}));
-	float TextureWidth = maxX-minX;
-	if (TextureWidth < 1) {return false;} // Avoiding issues with 0 width textures
-	float TextureHeight = maxY-minY;
-	if (TextureHeight < 1) {return false;} // Avoiding issues with 0 width textures
-	SDL_Texture* Texture = SDL_CreateTexture(
-		renderer,
-		SDL_PIXELFORMAT_RGBA32,
-		SDL_TEXTUREACCESS_TARGET,
-		TextureWidth,
-		TextureHeight
-	);
-	// Check if successful
-	if (!Texture) {
-		std::cerr << "Failed to create polygon texture: " << SDL_GetError() << std::endl;
-		return false;
-	}
-	// Set Texture as render target
-	SDL_Texture* prevTarget = SDL_GetRenderTarget(renderer);
-	SDL_SetRenderTarget(renderer, Texture);
-
-	vertices[0].position = { A.x - minX, A.y - minY };
-	vertices[1].position = { B.x - minX, B.y - minY };
-	vertices[2].position = { C.x - minX, C.y - minY };
-	vertices[0].tex_coord = { 0.0f, 0.0f };
-	vertices[1].tex_coord = { 0.0f, 0.0f };
-	vertices[2].tex_coord = { 0.0f, 0.0f };
-	// Draw the texture
+	// Render to the Supersample Texture
+	SDL_SetRenderTarget(renderer, supersampleTex);
 	SDL_RenderGeometry(renderer, nullptr, vertices.data(), 3, nullptr, 0);
-	// Add to Texture list
-	SDL_FRect rect = { minX ,minY ,TextureWidth,TextureHeight };
-	TriangleTextures.emplace_back(TEXTUREMETA(Texture,rect));
 	return true;
 }
 
@@ -181,6 +145,10 @@ static void renderThread(int Thread, int yMin, int yMax) {
 	}
 }
 void render3D() {
+	// Zwischentextur für Antialiasing (Supersampling) resetten
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_RenderClear(renderer); // Clear the Texture with white color
+
 	readVoxels(GameMap);
 	if (Debug == true) {RenderVoxelTime = SDL_GetTicks();}
 	for (int i = 0; i < VoxelQueue.size(); i++) {
@@ -216,16 +184,10 @@ void render3D() {
 	}
 	TriangleQueue.clear(); // Clear the Triangle Queue after rendering
 	if (Debug == true) { DrawTime = SDL_GetTicks() - DrawTime; }
-	// Present all Textures
-	SDL_SetRenderTarget(renderer, nullptr);
-	for (int i = 0; i < TriangleTextures.size(); i++) {
-		SDL_Texture* Texture = TriangleTextures[i].texture;
-		SDL_FRect rect = TriangleTextures[i].rect;
-		SDL_RenderTexture(renderer, Texture, nullptr, &rect);
-	}
-	// TriangleTextures are deleted in the end of the frame to avoid memory leaks
-	for (auto& meta : TriangleTextures) {
-		SDL_DestroyTexture(meta.texture);
-	}
 	TriangleTextures.clear();
+	// Draw the Supersampled Texture to the screen
+	SDL_SetRenderTarget(renderer, nullptr);
+	SDL_FRect rect = { 0,0,ScreenWidth,ScreenHeight };
+	SDL_RenderTexture(renderer, supersampleTex, nullptr, &rect);
+	SDL_DestroyTexture(supersampleTex);
 }

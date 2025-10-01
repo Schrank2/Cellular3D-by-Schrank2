@@ -16,10 +16,12 @@ float shadingStrength; // Strength of the shading based on depth
 int TickInterval;
 bool Debug;
 int GameWidth;
+int AAScale = 2; // 1 = none, 2 = 2x, 3 = 3x, 4 = 4x
 int GameHeight;
 int GameDepth; // The depth of the game map, can be used for 3D rendering
 int ThreadCount;
 int ThreadCountUsed; // Number of threads used
+SDL_Texture* supersampleTex;
 SDL_Window* window;
 SDL_Renderer* renderer;
 vector<vector<vector<int>>> GameMap;
@@ -57,6 +59,13 @@ int main(int argc, char* argv[])
 	}
 	window = SDL_CreateWindow("CELLULAR AUTOMATA", ScreenWidth, ScreenHeight, SDL_WINDOW_OPENGL);
 	renderer = SDL_CreateRenderer(window, nullptr);;
+	supersampleTex = SDL_CreateTexture(
+		renderer,
+		SDL_PIXELFORMAT_RGBA32,
+		SDL_TEXTUREACCESS_TARGET,
+		ScreenWidth * AAScale,
+		ScreenHeight * AAScale
+	);
 	cout << "Available Threads: " << ThreadCount << "   Using " << ThreadCountUsed << " Threads" << endl;
 	game();
 	cin.get();
