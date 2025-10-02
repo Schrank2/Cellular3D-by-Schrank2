@@ -131,6 +131,9 @@ inline static bool DrawTriangle(Triangle T) {
 	vertices[1].color = { T.color.r * c,T.color.g * c,T.color.b * c,T.color.a };
 	c = GetDepthDark(T.C.z);
 	vertices[2].color = { T.color.r * c,T.color.g * c,T.color.b * c,T.color.a };
+	vertices[0].position = A;
+	vertices[1].position = B;
+	vertices[2].position = C;
 	// Render to the Supersample Texture
 	SDL_SetRenderTarget(renderer, supersampleTex);
 	SDL_RenderGeometry(renderer, nullptr, vertices.data(), 3, nullptr, 0);
@@ -146,6 +149,7 @@ static void renderThread(int Thread, int yMin, int yMax) {
 }
 void render3D() {
 	// Zwischentextur für Antialiasing (Supersampling) resetten
+	SDL_SetRenderTarget(renderer, supersampleTex);
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	SDL_RenderClear(renderer); // Clear the Texture with white color
 
@@ -187,7 +191,6 @@ void render3D() {
 	TriangleTextures.clear();
 	// Draw the Supersampled Texture to the screen
 	SDL_SetRenderTarget(renderer, nullptr);
-	SDL_FRect rect = { 0,0,ScreenWidth,ScreenHeight };
+	SDL_FRect rect = {0,0,ScreenWidth,ScreenHeight};
 	SDL_RenderTexture(renderer, supersampleTex, nullptr, &rect);
-	SDL_DestroyTexture(supersampleTex);
 }

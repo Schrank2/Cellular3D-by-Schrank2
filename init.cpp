@@ -66,6 +66,9 @@ int main(int argc, char* argv[])
 		ScreenWidth * AAScale,
 		ScreenHeight * AAScale
 	);
+	if (!supersampleTex) {
+		std::cerr << "Failed to create supersampleTex: " << SDL_GetError() << std::endl;
+	}
 	cout << "Available Threads: " << ThreadCount << "   Using " << ThreadCountUsed << " Threads" << endl;
 	game();
 	cin.get();
