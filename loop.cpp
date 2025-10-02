@@ -21,10 +21,16 @@ int Pause = 0;
 int k = 1;
 float mouseX, mouseY;
 int mouseXgame, mouseYgame;
-const int neighborOffsets[8][2] = {
-	{-1, -1}, {0, -1}, {1, -1},
-	{-1,  0},         {1,  0},
-	{-1,  1}, {0,  1}, {1,  1}
+const int neighborOffsets[24][3] = {
+	{-1,-1,-1},{ 0,-1,-1},{ 1,-1,-1},
+	{-1, 0,-1},           { 1, 0,-1},
+	{-1, 1,-1},{ 0, 1,-1},{ 1, 1,-1},
+	{-1,-1, 0},{ 0,-1, 0},{ 1,-1, 0},
+	{-1, 0, 0},           { 1, 0, 0},
+	{-1, 1, 0},{ 0, 1, 0},{ 1, 1, 0},
+	{-1,-1, 1},{ 0,-1, 1},{ 1,-1, 1},
+	{-1, 0, 1},           { 1, 0, 1},
+	{-1, 1, 1},{ 0, 1, 1},{ 1, 1, 1}
 };
 std::vector<thread> threads;
 inline static void CellularAutomataRules(int txMin,int txMax,int tyMin, int tyMax) {
@@ -39,8 +45,9 @@ inline static void CellularAutomataRules(int txMin,int txMax,int tyMin, int tyMa
 				for (int o = 0; o < 8; o++) {
 					int ni = i + neighborOffsets[o][0];
 					int nj = j + neighborOffsets[o][1];
-					if (ni >= 0 && ni < GameWidth && nj >= 0 && nj < GameHeight) {
-						if (GameMap[ni][nj][k] == 1) {
+					int nk = k + neighborOffsets[o][2];
+					if (ni >= 0 && ni < GameWidth && nj >= 0 && nj < GameDepth && nk >= 0 && nk < GameHeight) {
+						if (GameMap[ni][nj][nk] == 1) {
 							neighbors++;
 						}
 					}
