@@ -137,25 +137,25 @@ int game() {
 		// Move forward
 		if (event.type == SDL_EVENT_KEY_DOWN) {
 			if (event.key.key == SDLK_W) {
-				CameraZ += 1;
+				CameraZ -= 1;
 			}
 		}
 		// Move leftwards
 		if (event.type == SDL_EVENT_KEY_DOWN) {
 			if (event.key.key == SDLK_A) {
-				CameraX -= 1;
+				CameraX += 1;
 			}
 		}
 		// Move backwards
 		if (event.type == SDL_EVENT_KEY_DOWN) {
 			if (event.key.key == SDLK_S) {
-				CameraZ -= 1;
+				CameraZ += 1;
 			}
 		}
 		// Move Forward
 		if (event.type == SDL_EVENT_KEY_DOWN) {
 			if (event.key.key == SDLK_D) {
-				CameraX += 1;
+				CameraX -= 1;
 			}
 		}
 		if (Debug == true) { InputTime = SDL_GetTicks() - InputTime; }
