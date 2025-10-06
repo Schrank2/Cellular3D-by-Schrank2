@@ -2,7 +2,7 @@
 mapDensity=0.7
 # ScreenWidth and ScreenHeight must both be divisible by GameScale without a remainder, or parts of the Screen will remain empty.
 # The Dimensions of each tile in pixels
-GameScale=64
+GameScale=128
 # The width of the game window in pixels
 ScreenWidth=1600 
 # The height of the game window in pixels
@@ -10,8 +10,8 @@ ScreenHeight=900
 # The percentage of CPU threads to use for the game
 ThreadCountUsage=1.0
 # Time between game ticks in milliseconds
-TickInterval=1
+TickInterval=500
 # Should debug messages be printed to the console
 Debug=true
 # How strong should the shading be?
-shadingStrength=0.15
+shadingStrength=0.4

@@ -42,11 +42,11 @@ inline static void CellularAutomataRules(int txMin,int txMax,int tyMin, int tyMa
 				survive = 0; neighbors = 0;
 				if (GameMap[i][j][k] == 1) { survive = 1; }
 				// Determine Neighbors
-				for (int o = 0; o < 8; o++) {
+				for (int o = 0; o < 24; o++) {
 					int ni = i + neighborOffsets[o][0];
 					int nj = j + neighborOffsets[o][1];
 					int nk = k + neighborOffsets[o][2];
-					if (ni >= 0 && ni < GameWidth && nj >= 0 && nj < GameDepth && nk >= 0 && nk < GameHeight) {
+					if (ni >= 0 && ni < GameWidth && nj >= 0 && nj < GameHeight && nk >= 0 && nk < GameDepth) {
 						if (GameMap[ni][nj][nk] == 1) {
 							neighbors++;
 						}
@@ -132,6 +132,30 @@ int game() {
 		if (event.type == SDL_EVENT_KEY_DOWN) {
 			if (event.key.key == SDLK_SPACE) {
 				Pause = !Pause;
+			}
+		}
+		// Move forward
+		if (event.type == SDL_EVENT_KEY_DOWN) {
+			if (event.key.key == SDLK_W) {
+				CameraZ += 1;
+			}
+		}
+		// Move leftwards
+		if (event.type == SDL_EVENT_KEY_DOWN) {
+			if (event.key.key == SDLK_A) {
+				CameraX -= 1;
+			}
+		}
+		// Move backwards
+		if (event.type == SDL_EVENT_KEY_DOWN) {
+			if (event.key.key == SDLK_S) {
+				CameraZ -= 1;
+			}
+		}
+		// Move Forward
+		if (event.type == SDL_EVENT_KEY_DOWN) {
+			if (event.key.key == SDLK_D) {
+				CameraX += 1;
 			}
 		}
 		if (Debug == true) { InputTime = SDL_GetTicks() - InputTime; }
