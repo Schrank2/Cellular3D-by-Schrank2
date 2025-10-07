@@ -18,11 +18,14 @@ struct Triangle {
 	Triangle(POS3D A, POS3D B, POS3D C, SDL_FColor color) : A(A), B(B), C(C), color(color) {}
 };
 struct TEXTUREMETA {
-	// Defining Components
 	SDL_Texture* texture;
 	SDL_FRect rect;
-	// Defining Constructor
 	TEXTUREMETA(SDL_Texture* texture, SDL_FRect rect) : texture(texture), rect(rect) {}
+};
+struct KEY {
+	string key;
+	bool pressed;
+	KEY(string Key; bool pressed) : key(key), pressed(pressed) {}
 };
 // Misc
 extern int CurrentTime;
@@ -37,6 +40,16 @@ extern int GameHeight;
 extern int GameDepth;
 extern int ThreadCount;
 extern int ThreadCountUsed;
+extern float CameraXVelocity;
+extern float CameraYVelocity;
+extern float CameraZVelocity;
+
+extern SDL_Window* window;
+extern SDL_Texture* supersampleTex;
+extern SDL_Renderer* renderer;
+extern SDL_Event event;
+extern std::vector<std::vector<std::vector<int>>> GameMap;
+extern std::vector<std::vector<std::vector<int>>> GameMapNext;
 // Debug Logs
 extern float TaskTime;
 extern float FrameTime;
@@ -50,16 +63,8 @@ extern float ReadVoxelTime;
 extern float DepthSortTime;
 extern float DrawTime;
 extern float InputTime;
-
-extern SDL_Window* window;
-extern SDL_Texture* supersampleTex;
-extern SDL_Renderer* renderer;
-extern SDL_Event event;
-extern std::vector<std::vector<std::vector<int>>> GameMap;
-extern std::vector<std::vector<std::vector<int>>> GameMapNext;
-extern struct Voxel;
-extern struct POS3D;
-extern struct Triangle;
+// Models
+extern std::vector<Triangle> VoxelModel;
 // Settings
 extern int GameScale; // The Dimensions of each tile in pixels
 extern float mapDensity; // The density of Cells in the beginning in 0.0 -> 1.0

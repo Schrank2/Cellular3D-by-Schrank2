@@ -12,7 +12,6 @@ using namespace std;
 mutex renderLock;
 vector<thread> RenderThreads;
 vector<TEXTUREMETA> TriangleTextures;
-vector<Triangle> VoxelModel;
 vector<Triangle> TriangleQueue; // Queue for Triangles
 // Adding all Voxels to a list.
 std::vector<Voxel> VoxelQueue;
@@ -101,25 +100,6 @@ static void renderThread(int Thread, int yMin, int yMax) {
 	}
 }
 void render3D() {
-	// Setting up Voxel Model
-	// Front Face
-	VoxelModel.emplace_back(Triangle{ {0,0,0},{0,1,0},{1,1,0},{1.0f,0.0f,0.0f,1.0f} });
-	VoxelModel.emplace_back(Triangle{ {0,0,0},{1,0,0},{1,1,0},{1.0f,0.0f,0.0f,1.0f} });
-	// Back Face
-	VoxelModel.emplace_back(Triangle{ {0,0,1},{0,1,1},{1,1,1},{0.0f,1.0f,0.0f,1.0f} });
-	VoxelModel.emplace_back(Triangle{ {0,0,1},{1,0,1},{1,1,1},{0.0f,1.0f,0.0f,1.0f} });
-	// Bottom Face
-	VoxelModel.emplace_back(Triangle{ {0,0,0},{1,0,0},{1,0,1},{0.0f,0.0f,1.0f,1.0f} });
-	VoxelModel.emplace_back(Triangle{ {0,0,0},{0,0,1},{1,0,1},{0.0f,0.0f,1.0f,1.0f} });
-	// Top Face
-	VoxelModel.emplace_back(Triangle{ {0,1,0},{1,1,0},{1,1,1},{1.0f,1.0f,0.0f,1.0f} });
-	VoxelModel.emplace_back(Triangle{ {0,1,0},{0,1,1},{1,1,1},{1.0f,1.0f,0.0f,1.0f} });
-	// Left Face
-	VoxelModel.emplace_back(Triangle{ {0,0,0},{0,1,0},{0,1,1},{0.0f,1.0f,1.0f,1.0f} });
-	VoxelModel.emplace_back(Triangle{ {0,0,0},{0,1,1},{0,0,1},{0.0f,1.0f,1.0f,1.0f} });
-	// Right Face
-	VoxelModel.emplace_back(Triangle{ {1,0,0},{1,1,0},{1,1,1},{1.0f,0.0f,1.0f,1.0f} });
-	VoxelModel.emplace_back(Triangle{ {1,0,0},{1,1,1},{1,0,1},{1.0f,0.0f,1.0f,1.0f} });
 	// Zwischentextur für Antialiasing (Supersampling) resetten
 	SDL_SetRenderTarget(renderer, supersampleTex);
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);

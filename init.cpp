@@ -26,6 +26,30 @@ SDL_Window* window;
 SDL_Renderer* renderer;
 vector<vector<vector<int>>> GameMap;
 vector<vector<vector<int>>> GameMapNext;
+vector<Triangle> VoxelModel;
+static vector<Triangle> loadModel() {
+	// Setting up Voxel Model
+	vector<Triangle> Model;
+	// Front Face
+	Model.emplace_back(Triangle{ {0,0,0},{0,1,0},{1,1,0},{1.0f,0.0f,0.0f,1.0f} });
+	Model.emplace_back(Triangle{ {0,0,0},{1,0,0},{1,1,0},{1.0f,0.0f,0.0f,1.0f} });
+	// Back Face
+	Model.emplace_back(Triangle{ {0,0,1},{0,1,1},{1,1,1},{0.0f,1.0f,0.0f,1.0f} });
+	Model.emplace_back(Triangle{ {0,0,1},{1,0,1},{1,1,1},{0.0f,1.0f,0.0f,1.0f} });
+	// Bottom Face
+	Model.emplace_back(Triangle{ {0,0,0},{1,0,0},{1,0,1},{0.0f,0.0f,1.0f,1.0f} });
+	Model.emplace_back(Triangle{ {0,0,0},{0,0,1},{1,0,1},{0.0f,0.0f,1.0f,1.0f} });
+	// Top Face
+	Model.emplace_back(Triangle{ {0,1,0},{1,1,0},{1,1,1},{1.0f,1.0f,0.0f,1.0f} });
+	Model.emplace_back(Triangle{ {0,1,0},{0,1,1},{1,1,1},{1.0f,1.0f,0.0f,1.0f} });
+	// Left Face
+	Model.emplace_back(Triangle{ {0,0,0},{0,1,0},{0,1,1},{0.0f,1.0f,1.0f,1.0f} });
+	Model.emplace_back(Triangle{ {0,0,0},{0,1,1},{0,0,1},{0.0f,1.0f,1.0f,1.0f} });
+	// Right Face
+	Model.emplace_back(Triangle{ {1,0,0},{1,1,0},{1,1,1},{1.0f,0.0f,1.0f,1.0f} });
+	Model.emplace_back(Triangle{ {1,0,0},{1,1,1},{1,0,1},{1.0f,0.0f,1.0f,1.0f} });
+	return Model;
+}
 // using pointers because weird
 int main(int argc, char* argv[])
 {
@@ -70,6 +94,7 @@ int main(int argc, char* argv[])
 		std::cerr << "Failed to create supersampleTex: " << SDL_GetError() << std::endl;
 	}
 	cout << "Available Threads: " << ThreadCount << "   Using " << ThreadCountUsed << " Threads" << endl;
+	VoxelModel = loadModel();
 	game();
 	cin.get();
 	return 0;

@@ -13,9 +13,16 @@ float FrameTime;
 float TickTime;
 float InputTime;
 int LastTime;
+// Camera Setup
 float CameraX = 0;
 float CameraY = 0;
 float CameraZ = -10;
+float CameraXVelocity = 0;
+float CameraYVelocity = 0;
+float CameraZVelocity = 0;
+// Input Setup
+KEY W = KEY("W", false);
+
 int GameTemp = 0;
 int Pause = 0;
 int k = 1;
@@ -130,26 +137,41 @@ int game() {
 			}
 		}
 		if (event.type == SDL_EVENT_KEY_DOWN) {
-			if (event.key.key == SDLK_SPACE) {
+			if (event.key.key == SDLK_P) {
 				Pause = !Pause;
 			}
 			// move forward
 			if (event.key.key == SDLK_W) {
-				CameraZ += 0.1;
+				CameraZVelocity += 0.1;
 			}
 			// move left
 			if (event.key.key == SDLK_A) {
-				CameraX += 0.1;
+				CameraXVelocity += 0.1;
 			}
 			// move right
 			if (event.key.key == SDLK_S) {
-				CameraZ -= 0.1;
+				CameraZVelocity -= 0.1;
 			}
 			// move back
 			if (event.key.key == SDLK_D) {
-				CameraX -= 0.1;
+				CameraXVelocity -= 0.1;
+			}
+			// move up
+			if (event.key.key == SDLK_SPACE) {
+				CameraYVelocity += 0.1;
+			}
+			// move down
+			if (event.key.key == SDLK_LSHIFT) {
+				CameraYVelocity -= 0.1;
 			}
 		}
+		// Moving the Camera according to its velocity
+		CameraX += CameraXVelocity * 0.3;
+		CameraXVelocity *= 0.9;
+		CameraY += CameraYVelocity * 0.3;
+		CameraYVelocity *= 0.9;
+		CameraZ += CameraZVelocity * 0.3;
+		CameraZVelocity *= 0.9;
 		if (Debug == true) { InputTime = SDL_GetTicks() - InputTime; }
 		FrameTime = SDL_GetTicks() - FrameTime;
 		if (Debug == true) { cout << "----------------------------------------" << endl; }
