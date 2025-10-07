@@ -41,6 +41,7 @@ struct Triangle {
 	// Defining Constructor
 	Triangle(POS3D A, POS3D B, POS3D C, SDL_FColor color) : A(A), B(B), C(C), color(color) {}
 };;
+vector<Triangle> VoxelModel;
 vector<Triangle> TriangleQueue; // Queue for Triangles
 
 // Adding all Voxels to a list.
@@ -70,36 +71,20 @@ inline static void readVoxels(const std::vector<std::vector<std::vector<int>>>& 
 inline static float ScreenCoordinateX(float x, float z) {
 	float Depth = z+CameraZ; // Adjusting depth for perspective
 	//float scale = ScreenWidth / static_cast<float>(GameWidth);
-	return ((x+CameraX) / Depth) + (ScreenWidth/2);
+	int a = (x + CameraX) / Depth;
+	int offset = ScreenWidth * 0.5;
+	return a + offset;
 }
 inline static float ScreenCoordinateY(float y, float z) {
-	float Depth = 1+z+CameraZ; // Adjusting depth for perspective
+	float Depth = z+CameraZ; // Adjusting depth for perspective
 	//float scale = ScreenHeight / static_cast<float>(GameHeight);
-	return ((y+CameraY) / Depth) + (ScreenHeight / 2);
+	int a = (y + CameraY) / Depth;
+	int offset = ScreenHeight * 0.5;
+	return  a + offset;
 }
 inline static void renderVoxel(Voxel V) {
-	//cout << "Rendering Voxel at (" << V.position.x << ", " << V.position.y << ", " << V.position.z << ") with color (" << V.color.r << ", " << V.color.g << ", " << V.color.b << ", " << V.color.a << ")" << endl;
-	vector<Triangle> Triangles;
-	// Front Face
-	Triangles.emplace_back(Triangle{{0,0,0},{0,1,0},{1,1,0},{1.0f,0.0f,0.0f,1.0f}});
-	Triangles.emplace_back(Triangle{{0,0,0},{1,0,0},{1,1,0},{1.0f,0.0f,0.0f,1.0f}});
-	// Back Face
-	Triangles.emplace_back(Triangle{{0,0,1},{0,1,1},{1,1,1},{0.0f,1.0f,0.0f,1.0f}});
-	Triangles.emplace_back(Triangle{{0,0,1},{1,0,1},{1,1,1},{0.0f,1.0f,0.0f,1.0f}});
-	// Bottom Face
-	Triangles.emplace_back(Triangle{{0,0,0},{1,0,0},{1,0,1},{0.0f,0.0f,1.0f,1.0f}});
-	Triangles.emplace_back(Triangle{{0,0,0},{0,0,1},{1,0,1},{0.0f,0.0f,1.0f,1.0f}});
-	// Top Face
-	Triangles.emplace_back(Triangle{{0,1,0},{1,1,0},{1,1,1},{1.0f,1.0f,0.0f,1.0f}});
-	Triangles.emplace_back(Triangle{{0,1,0},{0,1,1},{1,1,1},{1.0f,1.0f,0.0f,1.0f}});
-	// Left Face
-	Triangles.emplace_back(Triangle{{0,0,0},{0,1,0},{0,1,1},{0.0f,1.0f,1.0f,1.0f}});
-	Triangles.emplace_back(Triangle{{0,0,0},{0,1,1},{0,0,1},{0.0f,1.0f,1.0f,1.0f}});
-	// Right Face
-	Triangles.emplace_back(Triangle{{1,0,0},{1,1,0},{1,1,1},{1.0f,0.0f,1.0f,1.0f}});
-	Triangles.emplace_back(Triangle{{1,0,0},{1,1,1},{1,0,1},{1.0f,0.0f,1.0f,1.0f}});
-
-	
+	// Loading the Voxel Model
+	vector<Triangle> Triangles = VoxelModel;
 	// The Loop for Offsetting Triangles
 	for (int i = 0; i < Triangles.size(); i++) {
 		// Adjusting the position of the triangle based on the voxel position
@@ -148,6 +133,25 @@ static void renderThread(int Thread, int yMin, int yMax) {
 	}
 }
 void render3D() {
+	// Setting up Voxel Model
+	// Front Face
+	VoxelModel.emplace_back(Triangle{ {0,0,0},{0,1,0},{1,1,0},{1.0f,0.0f,0.0f,1.0f} });
+	VoxelModel.emplace_back(Triangle{ {0,0,0},{1,0,0},{1,1,0},{1.0f,0.0f,0.0f,1.0f} });
+	// Back Face
+	VoxelModel.emplace_back(Triangle{ {0,0,1},{0,1,1},{1,1,1},{0.0f,1.0f,0.0f,1.0f} });
+	VoxelModel.emplace_back(Triangle{ {0,0,1},{1,0,1},{1,1,1},{0.0f,1.0f,0.0f,1.0f} });
+	// Bottom Face
+	VoxelModel.emplace_back(Triangle{ {0,0,0},{1,0,0},{1,0,1},{0.0f,0.0f,1.0f,1.0f} });
+	VoxelModel.emplace_back(Triangle{ {0,0,0},{0,0,1},{1,0,1},{0.0f,0.0f,1.0f,1.0f} });
+	// Top Face
+	VoxelModel.emplace_back(Triangle{ {0,1,0},{1,1,0},{1,1,1},{1.0f,1.0f,0.0f,1.0f} });
+	VoxelModel.emplace_back(Triangle{ {0,1,0},{0,1,1},{1,1,1},{1.0f,1.0f,0.0f,1.0f} });
+	// Left Face
+	VoxelModel.emplace_back(Triangle{ {0,0,0},{0,1,0},{0,1,1},{0.0f,1.0f,1.0f,1.0f} });
+	VoxelModel.emplace_back(Triangle{ {0,0,0},{0,1,1},{0,0,1},{0.0f,1.0f,1.0f,1.0f} });
+	// Right Face
+	VoxelModel.emplace_back(Triangle{ {1,0,0},{1,1,0},{1,1,1},{1.0f,0.0f,1.0f,1.0f} });
+	VoxelModel.emplace_back(Triangle{ {1,0,0},{1,1,1},{1,0,1},{1.0f,0.0f,1.0f,1.0f} });
 	// Zwischentextur für Antialiasing (Supersampling) resetten
 	SDL_SetRenderTarget(renderer, supersampleTex);
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);

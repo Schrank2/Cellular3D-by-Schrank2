@@ -15,7 +15,7 @@ float InputTime;
 int LastTime;
 int CameraX = 0;
 int CameraY = 0;
-int CameraZ = 0;
+int CameraZ = -100;
 int GameTemp = 0;
 int Pause = 0;
 int k = 1;
