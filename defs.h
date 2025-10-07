@@ -2,6 +2,29 @@
 #include <vector>
 #ifndef COMMON_H
 #define COMMON_H
+// Structs
+struct POS3D {
+	float x, y, z;
+	POS3D(float x, float y, float z) : x(x), y(y), z(z) {}
+};
+struct Voxel {
+	POS3D position;
+	SDL_FColor color;
+	Voxel(POS3D position, SDL_FColor color) : position(position), color(color) {}
+};
+struct Triangle {
+	POS3D A, B, C;
+	SDL_FColor color;
+	Triangle(POS3D A, POS3D B, POS3D C, SDL_FColor color) : A(A), B(B), C(C), color(color) {}
+};
+struct TEXTUREMETA {
+	// Defining Components
+	SDL_Texture* texture;
+	SDL_FRect rect;
+	// Defining Constructor
+	TEXTUREMETA(SDL_Texture* texture, SDL_FRect rect) : texture(texture), rect(rect) {}
+};
+// Misc
 extern int CurrentTime;
 extern int StartTime;
 extern int LastTime;

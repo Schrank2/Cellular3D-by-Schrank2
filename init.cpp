@@ -26,20 +26,6 @@ SDL_Window* window;
 SDL_Renderer* renderer;
 vector<vector<vector<int>>> GameMap;
 vector<vector<vector<int>>> GameMapNext;
-struct Voxel {
-	POS3D position;
-	SDL_FColor color;
-	Voxel(POS3D position, SDL_FColor color) : position(position), color(color) {}
-};
-struct POS3D {
-	float x, y, z;
-	POS3D(float x, float y, float z) : x(x), y(y), z(z) {}
-};
-struct Triangle {
-	POS3D A, B, C;
-	SDL_FColor color;
-	Triangle(POS3D A, POS3D B, POS3D C, SDL_FColor color) : A(A), B(B), C(C), color(color) {}
-};
 // using pointers because weird
 int main(int argc, char* argv[])
 {

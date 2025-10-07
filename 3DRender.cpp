@@ -11,17 +11,9 @@ using namespace std;
 #include <tuple>
 mutex renderLock;
 vector<thread> RenderThreads;
-struct TEXTUREMETA {
-	// Defining Components
-	SDL_Texture* texture;
-	SDL_FRect rect;
-	// Defining Constructor
-	TEXTUREMETA(SDL_Texture* texture, SDL_FRect rect) : texture(texture), rect(rect) {}
-};
 vector<TEXTUREMETA> TriangleTextures;
 vector<Triangle> VoxelModel;
 vector<Triangle> TriangleQueue; // Queue for Triangles
-
 // Adding all Voxels to a list.
 std::vector<Voxel> VoxelQueue;
 inline static void readVoxels(const std::vector<std::vector<std::vector<int>>>& GameMap) {
