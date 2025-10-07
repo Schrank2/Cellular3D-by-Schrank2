@@ -21,6 +21,7 @@ int GameHeight;
 int GameDepth; // The depth of the game map, can be used for 3D rendering
 int ThreadCount;
 int ThreadCountUsed; // Number of threads used
+int FOV = 100;
 SDL_Texture* supersampleTex;
 SDL_Window* window;
 SDL_Renderer* renderer;

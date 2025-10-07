@@ -2,3 +2,4 @@
 # Add more Settings (Start Camera Offset etc.)
 # Add Support for more Models than Voxels and create a better way to store models / read obj models
 # Use OpenGL (and learn how to use it first lol)
+# add raycasted Cell manipulation

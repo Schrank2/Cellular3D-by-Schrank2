@@ -69,18 +69,18 @@ inline static void readVoxels(const std::vector<std::vector<std::vector<int>>>& 
 	if (Debug == true) {ReadVoxelTime = SDL_GetTicks() - ReadVoxelTime; }
 }
 inline static float ScreenCoordinateX(float x, float z) {
-	float Depth = z+CameraZ; // Adjusting depth for perspective
+	float Depth = 1+z-CameraZ; // Adjusting depth for perspective
 	//float scale = ScreenWidth / static_cast<float>(GameWidth);
-	int a = (x + CameraX) / Depth;
+	int a = ScreenWidth * (x + CameraX) / Depth;
 	int offset = ScreenWidth * 0.5;
-	return a + offset;
+	return  a;
 }
 inline static float ScreenCoordinateY(float y, float z) {
-	float Depth = z+CameraZ; // Adjusting depth for perspective
+	float Depth = 1+z-CameraZ; // Adjusting depth for perspective
 	//float scale = ScreenHeight / static_cast<float>(GameHeight);
-	int a = (y + CameraY) / Depth;
+	int a = ScreenHeight * (y + CameraY) / Depth;
 	int offset = ScreenHeight * 0.5;
-	return  a + offset;
+	return  a;
 }
 inline static void renderModel(Voxel V) {
 	// Loading the Voxel Model
