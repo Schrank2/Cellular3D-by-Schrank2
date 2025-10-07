@@ -137,7 +137,7 @@ int game() {
 		// Move forward
 		if (event.type == SDL_EVENT_KEY_DOWN) {
 			if (event.key.key == SDLK_W) {
-				CameraZ -= 1;
+				CameraZ += 1;
 			}
 		}
 		// Move leftwards
@@ -149,7 +149,7 @@ int game() {
 		// Move backwards
 		if (event.type == SDL_EVENT_KEY_DOWN) {
 			if (event.key.key == SDLK_S) {
-				CameraZ += 1;
+				CameraZ -= 1;
 			}
 		}
 		// Move Forward

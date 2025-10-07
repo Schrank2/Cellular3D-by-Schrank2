@@ -76,7 +76,7 @@ inline static float ScreenCoordinateX(float x, float z) {
 }
 inline static float ScreenCoordinateY(float y, float z) {
 	float Depth = 1+z-CameraZ; // Adjusting depth for perspective
-	int a = ScreenHeight * (y + CameraY) / Depth;
+	int a = ScreenWidth * (y + CameraY) / Depth;
 	int offset = ScreenHeight * 0.5;
 	return  a;
 }
