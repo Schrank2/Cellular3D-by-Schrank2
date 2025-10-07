@@ -14,7 +14,6 @@ extern int GameHeight;
 extern int GameDepth;
 extern int ThreadCount;
 extern int ThreadCountUsed;
-extern int FOV;
 // Debug Logs
 extern float TaskTime;
 extern float FrameTime;
@@ -35,6 +34,9 @@ extern SDL_Renderer* renderer;
 extern SDL_Event event;
 extern std::vector<std::vector<std::vector<int>>> GameMap;
 extern std::vector<std::vector<std::vector<int>>> GameMapNext;
+extern struct Voxel;
+extern struct POS3D;
+extern struct Triangle;
 // Settings
 extern int GameScale; // The Dimensions of each tile in pixels
 extern float mapDensity; // The density of Cells in the beginning in 0.0 -> 1.0

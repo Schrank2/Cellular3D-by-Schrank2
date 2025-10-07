@@ -19,28 +19,6 @@ struct TEXTUREMETA {
 	TEXTUREMETA(SDL_Texture* texture, SDL_FRect rect) : texture(texture), rect(rect) {}
 };
 vector<TEXTUREMETA> TriangleTextures;
-
-// Declaring the "Data Type" Voxel
-struct POS3D {
-	// Defining Components
-	float x, y, z;
-	// Defining Constructor
-	POS3D(float x, float y, float z) : x(x), y(y), z(z) {}
-};
-struct Voxel {
-	// Defining Components
-	POS3D position;
-	SDL_FColor color;
-	// Defining Constructor
-	Voxel(POS3D position, SDL_FColor color) : position(position), color(color) {}
-};
-struct Triangle {
-	// Defining Components
-	POS3D A, B, C;
-	SDL_FColor color;
-	// Defining Constructor
-	Triangle(POS3D A, POS3D B, POS3D C, SDL_FColor color) : A(A), B(B), C(C), color(color) {}
-};;
 vector<Triangle> VoxelModel;
 vector<Triangle> TriangleQueue; // Queue for Triangles
 
