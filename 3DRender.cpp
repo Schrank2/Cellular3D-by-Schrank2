@@ -82,7 +82,7 @@ inline static float ScreenCoordinateY(float y, float z) {
 	int offset = ScreenHeight * 0.5;
 	return  a + offset;
 }
-inline static void renderVoxel(Voxel V) {
+inline static void renderModel(Voxel V) {
 	// Loading the Voxel Model
 	vector<Triangle> Triangles = VoxelModel;
 	// The Loop for Offsetting Triangles
@@ -128,7 +128,7 @@ inline static bool DrawTriangle(Triangle T) {
 static void renderThread(int Thread, int yMin, int yMax) {
 	for (int i = yMin; i < yMax; i++) {
 		renderLock.lock(); // Used to avoid Deadlock Issue
-		renderVoxel(VoxelQueue[i]);
+		renderModel(VoxelQueue[i]);
 		renderLock.unlock();
 	}
 }
@@ -160,7 +160,7 @@ void render3D() {
 	readVoxels(GameMap);
 	if (Debug == true) {RenderVoxelTime = SDL_GetTicks();}
 	for (int i = 0; i < VoxelQueue.size(); i++) {
-		renderVoxel(VoxelQueue[i]);
+		renderModel(VoxelQueue[i]);
 	}
 	if (Debug == true) {RenderVoxelTime = SDL_GetTicks() - RenderVoxelTime;}
 

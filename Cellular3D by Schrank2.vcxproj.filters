@@ -44,5 +44,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="options.txt" />
+    <Text Include="todo.txt" />
   </ItemGroup>
 </Project>
