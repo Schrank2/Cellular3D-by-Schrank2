@@ -49,6 +49,23 @@ inline static float ScreenCoordinateY(float y, float z) {
 	int offset = ScreenHeight * 0.5;
 	return  a + offset;
 }
+// Condition for Triangle Culling
+inline static bool culled(Triangle T) { // TBH heavy Autopilot usage here
+	// Before Camera Culling
+	if (T.A.z < CameraZ && T.B.z < CameraZ && T.C.z < CameraZ) { return true; }
+	// Backface culling
+	// Compute two edges
+	float ux = T.B.x - T.A.x; float uy = T.B.y - T.A.y; float uz = T.B.z - T.A.z;
+	float vx = T.C.x - T.A.x; float vy = T.C.y - T.A.y; float vz = T.C.z - T.A.z;
+	// Compute normal (cross product)
+	float nx = uy * vz - uz * vy; float ny = uz * vx - ux * vz; float nz = ux * vy - uy * vx;
+	// View direction (from camera to vertex A)
+	float viewx = T.A.x - CameraX; float viewy = T.A.y - CameraY; float viewz = T.A.z - CameraZ;
+	// Dot product
+	float dot = nx * viewx + ny * viewy + nz * viewz;
+	// Cull if the triangle is facing away from the camera
+	return (dot >= 0.0f);
+}
 inline static void renderModel(Voxel V) {
 	// Loading the Voxel Model
 	vector<Triangle> Triangles = VoxelModel;
@@ -64,7 +81,9 @@ inline static void renderModel(Voxel V) {
 		Triangles[i].C.x += V.position.x;
 		Triangles[i].C.y += V.position.y;
 		Triangles[i].C.z += V.position.z;
-		TriangleQueue.emplace_back(Triangles[i]);
+		if (!culled(Triangles[i])) {
+			TriangleQueue.emplace_back(Triangles[i]);
+		}
 	}
 };
 inline static float GetDepthDark(float A) {
