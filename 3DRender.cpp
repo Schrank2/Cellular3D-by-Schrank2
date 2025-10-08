@@ -28,7 +28,7 @@ inline static void readVoxels(const std::vector<std::vector<std::vector<int>>>& 
 						d = 1.0f / k;
 					}
 					SDL_FColor color{ 0.0f , 0.0f , 0.0f , 1.0f }; // LATER UNUSED !!!
-					POS3D pos(i, j, k);
+					POS3D pos(i-(GameWidth*0.5), j-(GameHeight*0.5), k-(GameDepth*0.5));
 					Voxel v = Voxel(pos, color);
 					VoxelQueue.emplace_back(v);
 				}
@@ -41,13 +41,13 @@ inline static float ScreenCoordinateX(float x, float z) {
 	float Depth = 1+z-CameraZ; // Adjusting depth for perspective
 	int a = ScreenWidth * (x + CameraX) / Depth;
 	int offset = ScreenWidth * 0.5;
-	return  a;
+	return  a + offset;
 }
 inline static float ScreenCoordinateY(float y, float z) {
 	float Depth = 1+z-CameraZ; // Adjusting depth for perspective
 	int a = ScreenWidth * (y + CameraY) / Depth;
 	int offset = ScreenHeight * 0.5;
-	return  a;
+	return  a + offset;
 }
 inline static void renderModel(Voxel V) {
 	// Loading the Voxel Model
