@@ -3,4 +3,7 @@
 # Add Support for more Models than Voxels and create a better way to store models / read obj models
 # Use OpenGL (and learn how to use it first lol)
 # add raycasted Cell manipulation
-# smootheres Movement
+DONE smootheres Movement
+# better shading (in OpenGL)
+# more Settings ig (Movement Speed, Movement "Slipperyness", Shading Curve, etc.)
+# Better Depth Sorting

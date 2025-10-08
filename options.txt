@@ -10,8 +10,8 @@ ScreenHeight=900
 # The percentage of CPU threads to use for the game
 ThreadCountUsage=1.0
 # Time between game ticks in milliseconds
-TickInterval=500
+TickInterval=2000
 # Should debug messages be printed to the console
 Debug=true
 # How strong should the shading be?
-shadingStrength=0.4
+shadingStrength=0.3

@@ -68,7 +68,9 @@ inline static void renderModel(Voxel V) {
 	}
 };
 inline static float GetDepthDark(float A) {
-	A = shadingStrength * A + 1.0f;
+	int CameraDistance = A - CameraZ;
+	A = shadingStrength * (CameraDistance + 1.0f);
+	if (A == 0) { A = 1.0f; }
 	A = 1 / A;
 	return A;
 }
