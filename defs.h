@@ -22,10 +22,9 @@ struct TEXTUREMETA {
 	SDL_FRect rect;
 	TEXTUREMETA(SDL_Texture* texture, SDL_FRect rect) : texture(texture), rect(rect) {}
 };
-struct KEY {
-	string key;
-	bool pressed;
-	KEY(string Key; bool pressed) : key(key), pressed(pressed) {}
+struct KEYBOARD {
+	bool W, A, S, D, LSHIFT, SPACE;
+	KEYBOARD(bool W, bool A, bool S, bool D, bool LSHIFT, bool SPACE) : W(W),A(A),S(S),D(D),LSHIFT(LSHIFT),SPACE(SPACE) {}
 };
 // Misc
 extern int CurrentTime;
@@ -43,6 +42,7 @@ extern int ThreadCountUsed;
 extern float CameraXVelocity;
 extern float CameraYVelocity;
 extern float CameraZVelocity;
+extern bool Pause;
 
 extern SDL_Window* window;
 extern SDL_Texture* supersampleTex;

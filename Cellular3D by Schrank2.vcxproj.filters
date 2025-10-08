@@ -30,6 +30,9 @@
     <ClCompile Include="3DRender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gamelogic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="defs.h">

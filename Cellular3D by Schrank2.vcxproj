@@ -84,6 +84,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="3DRender.cpp" />
+    <ClCompile Include="gamelogic.cpp" />
     <ClCompile Include="loop.cpp" />
     <ClCompile Include="init.cpp" />
     <ClCompile Include="readsettings.cpp" />
