@@ -7,3 +7,4 @@ DONE smootheres Movement
 # better shading (in OpenGL)
 # more Settings ig (Movement Speed, Movement "Slipperyness", Shading Curve, etc.)
 # Better Depth Sorting (a Z-Buffer pls)
+# fix FPS measurements (check in loop and in 3DRender, probably doubled it)
