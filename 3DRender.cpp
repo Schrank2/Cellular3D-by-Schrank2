@@ -149,21 +149,15 @@ void render3D() {
 	// Sort the Triangles by Depth
 	if (Debug == true) { DepthSortTime = SDL_GetTicks(); }
 	std::sort(TriangleQueue.begin(), TriangleQueue.end(), [](const Triangle& a, const Triangle& b) {
-		float zA = (a.A.z + a.B.z + a.C.z) / 3.0f; // Average Z value of triangle A
+		float zA= (a.A.z + a.B.z + a.C.z) / 3.0f; // Average Z value of triangle A
 		float zB = (b.A.z + b.B.z + b.C.z) / 3.0f; // Average Z value of triangle B
-		//float zA = max(a.A.z, max(a.B.z, a.C.z)) - CameraZ; // Max Z value of triangle A
-		//float zB = max(b.A.z, max(b.B.z, b.C.z)) - CameraZ; // Max Z value of triangle B
-		if (zA != zB) { return zA > zB; } // Primary sort by Z (depth)
-		float xA = (a.A.x + a.B.x + a.C.x) / 3.0f; // Average X value of triangle A
-		float xB = (b.A.x + b.B.x + b.C.x) / 3.0f; // Average X value of triangle B
-		//float xA = max(a.A.x, max(a.B.x, a.C.x)) - CameraX; // Max X value of triangle A
-		//float xB = max(b.A.x, max(b.B.x, b.C.x)) - CameraX; // Max X value of triangle B
-		if (xA != xB) return xA < xB; // Secondary sort by X
 		float yA = (a.A.y + a.B.y + a.C.y) / 3.0f; // Average Y value of triangle A
 		float yB = (b.A.y + b.B.y + b.C.y) / 3.0f; // Average Y value of triangle B
-		//float yA = max(a.A.y, max(a.B.y, a.C.y)) - CameraY; // Max Y value of triangle A
-		//float yB = max(b.A.y, max(b.B.y, b.C.y)) - CameraY; // Max Y value of triangle B
-		if (yA != yB) return yA > yB; // Tertiary sort by Y
+		float xA = (a.A.x + a.B.x + a.C.x) / 3.0f; // Average X value of triangle A
+		float xB = (b.A.x + b.B.x + b.C.x) / 3.0f; // Average X value of triangle B
+		float DistA = sqrt((CameraX - xA) * (CameraX - xA) + (CameraY - yA) * (CameraY - yA) + (CameraZ - zA) * (CameraZ - zA));
+		float DistB = sqrt((CameraX - xB) * (CameraX - xB) + (CameraY - yB) * (CameraY - yB) + (CameraZ - zB) * (CameraZ - zB));
+		if (DistA != DistB) return DistA > DistB; // Compare based on distance to Camera
 		return false;
 		});
 	if (Debug == true) { DepthSortTime = SDL_GetTicks() - DepthSortTime; }
