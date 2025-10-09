@@ -42,7 +42,7 @@ static vector<Triangle> loadModel() {
 	Model.emplace_back(Triangle{ {1,0,0},{1,0,1},{0,0,0},{0.0f,0.0f,1.0f,1.0f} });
 	Model.emplace_back(Triangle{ {0,0,0},{0,0,1},{1,0,1},{0.0f,0.0f,1.0f,1.0f} });
 	// Top Face
-	Model.emplace_back(Triangle{ {1,1,1},{1,1,0},{0,1,0},{1.0f,1.0f,0.0f,1.0f} });
+	Model.emplace_back(Triangle{ {0,1,0},{1,1,1},{1,1,0},{1.0f,1.0f,0.0f,1.0f} });
 	Model.emplace_back(Triangle{ {1,1,1},{0,1,1},{0,1,0},{1.0f,1.0f,0.0f,1.0f} });
 	// Left Face
 	Model.emplace_back(Triangle{ {0,0,0},{0,1,1},{0,0,1},{0.0f,1.0f,1.0f,1.0f} });

@@ -64,7 +64,7 @@ inline static bool culled(Triangle T) { // TBH heavy Autopilot usage here
 	// Dot product
 	float dot = nx * viewx + ny * viewy + nz * viewz;
 	// Cull if the triangle is facing away from the camera
-	return (dot >= 0.0f);
+	return false;//(dot >= 0.0f);
 }
 inline static void renderModel(Voxel V) {
 	// Loading the Voxel Model
@@ -149,13 +149,32 @@ void render3D() {
 	// Sort the Triangles by Depth
 	if (Debug == true) {DepthSortTime = SDL_GetTicks(); }
 	std::sort(TriangleQueue.begin(), TriangleQueue.end(), [](const Triangle& a, const Triangle& b) {
+		float xA = (a.A.x + a.B.x + a.C.x) / 3.0f; // Average X value of triangle A
+		float xB = (b.A.x + b.B.x + b.C.x) / 3.0f; // Average X value of triangle B
+		float yA = (a.A.y + a.B.y + a.C.y) / 3.0f; // Average Y value of triangle A
+		float yB = (b.A.y + b.B.y + b.C.y) / 3.0f; // Average Y value of triangle B
 		float zA = (a.A.z + a.B.z + a.C.z) / 3.0f; // Average Z value of triangle A
 		float zB = (b.A.z + b.B.z + b.C.z) / 3.0f; // Average Z value of triangle B
-		return zA > zB; // Sort in descending order (farthest first)
-		});
-	if (Debug == true) {DepthSortTime = SDL_GetTicks() - DepthSortTime; }
+		bool z = zA > zB;
+		bool ze = zA == zB;
+		bool x = xA > xB;
+		bool xe = xA == xB;
+		bool y = yA > yB;
+		bool ye = yA == yB;
+		if (z) { return true; }
+		else if (ze) {
+			if (x) {
+				return true;
+			}
+			else if (xe) {
+				if (y) { return true; }
+			}
+			return false;
+		};
+	}
+	if (Debug == true) { DepthSortTime = SDL_GetTicks() - DepthSortTime; }
 	// Render all Triangles
-	if (Debug == true) { DrawTime = SDL_GetTicks();}
+	if (Debug == true) { DrawTime = SDL_GetTicks(); }
 	for (int i = 0; i < TriangleQueue.size(); i++) {
 		DrawTriangle(TriangleQueue[i]);
 	}
@@ -163,7 +182,6 @@ void render3D() {
 	if (Debug == true) { DrawTime = SDL_GetTicks() - DrawTime; }
 	TriangleTextures.clear();
 	// Draw the Supersampled Texture to the screen
-	SDL_SetRenderTarget(renderer, nullptr);
-	SDL_FRect rect = {0,0,ScreenWidth,ScreenHeight};
-	SDL_RenderTexture(renderer, supersampleTex, nullptr, &rect);
-}
+		SDL_SetRenderTarget(renderer, nullptr);
+		SDL_FRect rect = { 0,0,ScreenWidth,ScreenHeight };
+		SDL_RenderTexture(renderer, supersampleTex, nullptr, &rect);
