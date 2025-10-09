@@ -38,21 +38,21 @@ inline static void readVoxels(const std::vector<std::vector<std::vector<int>>>& 
 	if (Debug == true) {ReadVoxelTime = SDL_GetTicks() - ReadVoxelTime; }
 }
 inline static float ScreenCoordinateX(float x, float z) {
-	float Depth = 1+z-CameraZ; // Adjusting depth for perspective
-	int a = ScreenWidth * (x + CameraX) / Depth;
+	float Depth = 1+z-C1.z; // Adjusting depth for perspective
+	int a = ScreenWidth * (x + C1.x) / Depth;
 	int offset = ScreenWidth * 0.5;
 	return  a + offset;
 }
 inline static float ScreenCoordinateY(float y, float z) {
-	float Depth = 1+z-CameraZ; // Adjusting depth for perspective
-	int a = ScreenWidth * (y + CameraY) / Depth;
+	float Depth = 1+z-C1.z; // Adjusting depth for perspective
+	int a = ScreenWidth * (y + C1.y) / Depth;
 	int offset = ScreenHeight * 0.5;
 	return  -a + offset;
 }
 // Condition for Triangle Culling
 inline static bool culled(Triangle T) { // TBH heavy Autopilot usage here
 	// Before Camera Culling
-	if (T.A.z < CameraZ && T.B.z < CameraZ && T.C.z < CameraZ) { return true; }
+	if (T.A.z < C1.z && T.B.z < C1.z && T.C.z < C1.z) { return true; }
 	// Backface culling
 	// Compute two edges
 	float ux = T.B.x - T.A.x; float uy = T.B.y - T.A.y; float uz = T.B.z - T.A.z;
@@ -60,7 +60,7 @@ inline static bool culled(Triangle T) { // TBH heavy Autopilot usage here
 	// Compute normal (cross product)
 	float nx = uy * vz - uz * vy; float ny = uz * vx - ux * vz; float nz = ux * vy - uy * vx;
 	// View direction (from camera to vertex A)
-	float viewx = T.A.x - CameraX; float viewy = T.A.y - CameraY; float viewz = T.A.z - CameraZ;
+	float viewx = T.A.x - C1.x; float viewy = T.A.y - C1.y; float viewz = T.A.z - C1.z;
 	// Dot product
 	float dot = nx * viewx + ny * viewy + nz * viewz;
 	// Cull if the triangle is facing away from the camera
@@ -87,7 +87,7 @@ inline static void renderModel(Voxel V) {
 	}
 };
 inline static float GetDepthDark(float A) {
-	int CameraDistance = A - CameraZ;
+	int CameraDistance = A - C1.z;
 	A = shadingStrength * (CameraDistance + 1.0f);
 	if (A == 0) { A = 1.0f; }
 	A = 1 / A;

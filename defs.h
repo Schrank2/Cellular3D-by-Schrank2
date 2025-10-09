@@ -31,18 +31,23 @@ extern int CurrentTime;
 extern int StartTime;
 extern int LastTime;
 extern int Toggle;
-extern float CameraX;
-extern float CameraY;
-extern float CameraZ;
 extern int GameWidth;
 extern int GameHeight;
 extern int GameDepth;
 extern int ThreadCount;
 extern int ThreadCountUsed;
-extern float CameraXVelocity;
-extern float CameraYVelocity;
-extern float CameraZVelocity;
 extern bool Pause;
+// Camera
+struct Camera {
+	float x;
+	float y;
+	float z;
+	float vx;
+	float vy;
+	float vz;
+	Camera(float x,float y, float z,float vx,float vy, float vz) : x(x),y(y),z(z),vx(vx),vy(vy),vz(vz) {}
+};
+extern Camera C1;
 
 extern SDL_Window* window;
 extern SDL_Texture* supersampleTex;

@@ -40,19 +40,19 @@ void inputHandler() {
 		if (event.key.key == SDLK_SPACE) { Keyboard.SPACE = false; }
 		if (event.key.key == SDLK_LSHIFT) { Keyboard.LSHIFT = false; }
 	}
-	if (Keyboard.W == true){ CameraZVelocity += 0.1; }
-	if (Keyboard.A == true) { CameraXVelocity += 0.1; }
-	if (Keyboard.S == true) { CameraZVelocity -= 0.1; }
-	if (Keyboard.D == true) { CameraXVelocity -= 0.1; }
-	if (Keyboard.SPACE == true) { CameraYVelocity -= 0.1; }
-	if (Keyboard.LSHIFT == true) { CameraYVelocity += 0.1; }
+	if (Keyboard.W == true){ C1.vz += 0.1; }
+	if (Keyboard.A == true) { C1.vx += 0.1; }
+	if (Keyboard.S == true) { C1.vz -= 0.1; }
+	if (Keyboard.D == true) { C1.vx -= 0.1; }
+	if (Keyboard.SPACE == true) { C1.vy -= 0.1; }
+	if (Keyboard.LSHIFT == true) { C1.vy += 0.1; }
 	// Moving the Camera according to its velocity
-	CameraX += CameraXVelocity * 0.3;
-	CameraXVelocity *= 0.9;
-	CameraY += CameraYVelocity * 0.3;
-	CameraYVelocity *= 0.9;
-	CameraZ += CameraZVelocity * 0.3;
-	CameraZVelocity *= 0.9;
+	C1.x += C1.vx * 0.3;
+	C1.vx *= 0.9;
+	C1.y += C1.vy * 0.3;
+	C1.vy *= 0.9;
+	C1.z += C1.vz * 0.3;
+	C1.vz *= 0.9;
 	if (Debug == true) { InputTime = SDL_GetTicks() - InputTime; }
 	FrameTime = SDL_GetTicks() - FrameTime;
 	if (Debug == true) { cout << "----------------------------------------" << endl; }

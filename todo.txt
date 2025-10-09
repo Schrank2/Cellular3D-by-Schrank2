@@ -6,4 +6,4 @@
 DONE smootheres Movement
 # better shading (in OpenGL)
 # more Settings ig (Movement Speed, Movement "Slipperyness", Shading Curve, etc.)
-# Better Depth Sorting
+# Better Depth Sorting (a Z-Buffer pls)
