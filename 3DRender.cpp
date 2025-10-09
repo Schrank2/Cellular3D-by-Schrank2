@@ -149,9 +149,9 @@ void render3D() {
 	// Sort the Triangles by Depth
 	if (Debug == true) { DepthSortTime = SDL_GetTicks(); }
 	std::sort(TriangleQueue.begin(), TriangleQueue.end(), [](const Triangle& a, const Triangle& b) {
-		float minZA = std::min({ a.A.z, a.B.z, a.C.z });
-		float minZB = std::min({ b.A.z, b.B.z, b.C.z });
-		return minZA > minZB;
+		float AVGzA = (a.A.z + a.B.z + a.C.z) / 3.0f;
+		float AVGzB = (b.A.z + b.B.z + b.C.z) / 3.0f;
+		return AVGzA > AVGzB;
 		});
 	if (Debug == true) { DepthSortTime = SDL_GetTicks() - DepthSortTime; }
 	// Render all Triangles
