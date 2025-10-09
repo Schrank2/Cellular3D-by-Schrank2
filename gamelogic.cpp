@@ -44,8 +44,8 @@ void inputHandler() {
 	if (Keyboard.A == true) { CameraXVelocity += 0.1; }
 	if (Keyboard.S == true) { CameraZVelocity -= 0.1; }
 	if (Keyboard.D == true) { CameraXVelocity -= 0.1; }
-	if (Keyboard.SPACE == true) { CameraYVelocity += 0.1; }
-	if (Keyboard.LSHIFT == true) { CameraYVelocity -= 0.1; }
+	if (Keyboard.SPACE == true) { CameraYVelocity -= 0.1; }
+	if (Keyboard.LSHIFT == true) { CameraYVelocity += 0.1; }
 	// Moving the Camera according to its velocity
 	CameraX += CameraXVelocity * 0.3;
 	CameraXVelocity *= 0.9;

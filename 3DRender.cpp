@@ -47,7 +47,7 @@ inline static float ScreenCoordinateY(float y, float z) {
 	float Depth = 1+z-CameraZ; // Adjusting depth for perspective
 	int a = ScreenWidth * (y + CameraY) / Depth;
 	int offset = ScreenHeight * 0.5;
-	return  a + offset;
+	return  -a + offset;
 }
 // Condition for Triangle Culling
 inline static bool culled(Triangle T) { // TBH heavy Autopilot usage here
@@ -71,7 +71,7 @@ inline static void renderModel(Voxel V) {
 	vector<Triangle> Triangles = VoxelModel;
 	// The Loop for Offsetting Triangles
 	for (int i = 0; i < Triangles.size(); i++) {
-		// Adjusting the position of the triangle based on the voxel position
+		// Adjusting the position of the triangle based on the Models position
 		Triangles[i].A.x += V.position.x;
 		Triangles[i].A.y += V.position.y;
 		Triangles[i].A.z += V.position.z;
@@ -127,14 +127,14 @@ void render3D() {
 	SDL_RenderClear(renderer); // Clear the Texture with white color
 
 	readVoxels(GameMap);
-	if (Debug == true) {RenderVoxelTime = SDL_GetTicks();}
+	if (Debug == true) { RenderVoxelTime = SDL_GetTicks(); }
 	for (int i = 0; i < VoxelQueue.size(); i++) {
 		renderModel(VoxelQueue[i]);
 	}
-	if (Debug == true) {RenderVoxelTime = SDL_GetTicks() - RenderVoxelTime;}
+	if (Debug == true) { RenderVoxelTime = SDL_GetTicks() - RenderVoxelTime; }
 
 	// Rendering Multithreaded
-	if (Debug == true) {RenderRectangleTime = SDL_GetTicks();}
+	if (Debug == true) { RenderRectangleTime = SDL_GetTicks(); }
 	RenderThreads.clear();
 	int rowLength = GameHeight / ThreadCountUsed;
 	for (int i = 0; i < ThreadCountUsed; i++) {
@@ -145,33 +145,27 @@ void render3D() {
 
 	}
 	for (auto& th : RenderThreads) { th.join(); }; // Wait for the Rectangles to be calculated
-	if (Debug == true) {RenderRectangleTime = SDL_GetTicks() - RenderRectangleTime;}
+	if (Debug == true) { RenderRectangleTime = SDL_GetTicks() - RenderRectangleTime; }
 	// Sort the Triangles by Depth
-	if (Debug == true) {DepthSortTime = SDL_GetTicks(); }
+	if (Debug == true) { DepthSortTime = SDL_GetTicks(); }
 	std::sort(TriangleQueue.begin(), TriangleQueue.end(), [](const Triangle& a, const Triangle& b) {
-		float xA = (a.A.x + a.B.x + a.C.x) / 3.0f; // Average X value of triangle A
-		float xB = (b.A.x + b.B.x + b.C.x) / 3.0f; // Average X value of triangle B
-		float yA = (a.A.y + a.B.y + a.C.y) / 3.0f; // Average Y value of triangle A
-		float yB = (b.A.y + b.B.y + b.C.y) / 3.0f; // Average Y value of triangle B
 		float zA = (a.A.z + a.B.z + a.C.z) / 3.0f; // Average Z value of triangle A
 		float zB = (b.A.z + b.B.z + b.C.z) / 3.0f; // Average Z value of triangle B
-		bool z = zA > zB;
-		bool ze = zA == zB;
-		bool x = xA > xB;
-		bool xe = xA == xB;
-		bool y = yA > yB;
-		bool ye = yA == yB;
-		if (z) { return true; }
-		else if (ze) {
-			if (x) {
-				return true;
-			}
-			else if (xe) {
-				if (y) { return true; }
-			}
-			return false;
-		};
-	}
+		//float zA = max(a.A.z, max(a.B.z, a.C.z)) - CameraZ; // Max Z value of triangle A
+		//float zB = max(b.A.z, max(b.B.z, b.C.z)) - CameraZ; // Max Z value of triangle B
+		if (zA != zB) { return zA > zB; } // Primary sort by Z (depth)
+		float xA = (a.A.x + a.B.x + a.C.x) / 3.0f; // Average X value of triangle A
+		float xB = (b.A.x + b.B.x + b.C.x) / 3.0f; // Average X value of triangle B
+		//float xA = max(a.A.x, max(a.B.x, a.C.x)) - CameraX; // Max X value of triangle A
+		//float xB = max(b.A.x, max(b.B.x, b.C.x)) - CameraX; // Max X value of triangle B
+		if (xA != xB) return xA < xB; // Secondary sort by X
+		float yA = (a.A.y + a.B.y + a.C.y) / 3.0f; // Average Y value of triangle A
+		float yB = (b.A.y + b.B.y + b.C.y) / 3.0f; // Average Y value of triangle B
+		//float yA = max(a.A.y, max(a.B.y, a.C.y)) - CameraY; // Max Y value of triangle A
+		//float yB = max(b.A.y, max(b.B.y, b.C.y)) - CameraY; // Max Y value of triangle B
+		if (yA != yB) return yA > yB; // Tertiary sort by Y
+		return false;
+		});
 	if (Debug == true) { DepthSortTime = SDL_GetTicks() - DepthSortTime; }
 	// Render all Triangles
 	if (Debug == true) { DrawTime = SDL_GetTicks(); }
@@ -182,6 +176,7 @@ void render3D() {
 	if (Debug == true) { DrawTime = SDL_GetTicks() - DrawTime; }
 	TriangleTextures.clear();
 	// Draw the Supersampled Texture to the screen
-		SDL_SetRenderTarget(renderer, nullptr);
-		SDL_FRect rect = { 0,0,ScreenWidth,ScreenHeight };
-		SDL_RenderTexture(renderer, supersampleTex, nullptr, &rect);
+	SDL_SetRenderTarget(renderer, nullptr);
+	SDL_FRect rect = { 0,0,ScreenWidth,ScreenHeight };
+	SDL_RenderTexture(renderer, supersampleTex, nullptr, &rect);
+}
