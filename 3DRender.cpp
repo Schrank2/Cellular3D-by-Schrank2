@@ -149,16 +149,9 @@ void render3D() {
 	// Sort the Triangles by Depth
 	if (Debug == true) { DepthSortTime = SDL_GetTicks(); }
 	std::sort(TriangleQueue.begin(), TriangleQueue.end(), [](const Triangle& a, const Triangle& b) {
-		float zA= (a.A.z + a.B.z + a.C.z) / 3.0f; // Average Z value of triangle A
-		float zB = (b.A.z + b.B.z + b.C.z) / 3.0f; // Average Z value of triangle B
-		float yA = (a.A.y + a.B.y + a.C.y) / 3.0f; // Average Y value of triangle A
-		float yB = (b.A.y + b.B.y + b.C.y) / 3.0f; // Average Y value of triangle B
-		float xA = (a.A.x + a.B.x + a.C.x) / 3.0f; // Average X value of triangle A
-		float xB = (b.A.x + b.B.x + b.C.x) / 3.0f; // Average X value of triangle B
-		float DistA = sqrt((CameraX - xA) * (CameraX - xA) + (CameraY - yA) * (CameraY - yA) + (CameraZ - zA) * (CameraZ - zA));
-		float DistB = sqrt((CameraX - xB) * (CameraX - xB) + (CameraY - yB) * (CameraY - yB) + (CameraZ - zB) * (CameraZ - zB));
-		if (DistA != DistB) return DistA > DistB; // Compare based on distance to Camera
-		return false;
+		float minZA = std::min({ a.A.z, a.B.z, a.C.z });
+		float minZB = std::min({ b.A.z, b.B.z, b.C.z });
+		return minZA > minZB;
 		});
 	if (Debug == true) { DepthSortTime = SDL_GetTicks() - DepthSortTime; }
 	// Render all Triangles
