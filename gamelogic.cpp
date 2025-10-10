@@ -53,9 +53,4 @@ void inputHandler() {
 	C1.vy *= 0.9;
 	C1.z += C1.vz * 0.3;
 	C1.vz *= 0.9;
-	if (Debug == true) { InputTime = SDL_GetTicks() - InputTime; }
-	FrameTime = SDL_GetTicks() - FrameTime;
-	if (Debug == true) { cout << "----------------------------------------" << endl; }
-	if (Debug == true) { cout << "FPS: " << 1000.0f / FrameTime << "   FrameTime: " << FrameTime << "ms" << "   Rendering: " << RenderTime << "ms" << "   Voxels: " << RenderVoxelTime << "ms" << "   Rectangles: " << RenderRectangleTime << "ms" << "   RenderInit: " << RenderInitTime << "ms" << "   RenderPresent: " << RenderPresentTime << "ms" << endl; };
-	if (Debug == true) { cout << "TickTime: " << TickTime << "ms" << "   ReadVoxels: " << ReadVoxelTime << "ms" << "   DepthSorting: " << DepthSortTime << "ms" << "   Drawing: " << DrawTime << "ms" << "   InputTime: " << InputTime << "ms" << endl; }
 }

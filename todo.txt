@@ -1,10 +1,12 @@
 # RenderModel() is done multithreaded, and also singlethreaded, which seems redundant
 # Add more Settings (Start Camera Offset etc.)
 # Add Support for more Models than Voxels and create a better way to store models / read obj models
-# Use OpenGL (and learn how to use it first lol)
 # add raycasted Cell manipulation
 DONE smootheres Movement
-# better shading (in OpenGL)
 # more Settings ig (Movement Speed, Movement "Slipperyness", Shading Curve, etc.)
+DONE fix FPS measurements (check in loop and in 3DRender, probably doubled it)
+
+OPENGL
+# Use OpenGL (and learn how to use it first lol)
 # Better Depth Sorting (a Z-Buffer pls)
-# fix FPS measurements (check in loop and in 3DRender, probably doubled it)
+# better shading (in OpenGL)

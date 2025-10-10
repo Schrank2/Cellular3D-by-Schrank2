@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
 		ScreenHeight * AAScale
 	);
 	if (!supersampleTex) {
-		std::cerr << "Failed to create supersampleTex: " << SDL_GetError() << std::endl;
+		std::cerr << "Failed to create supersample Texture: " << SDL_GetError() << std::endl;
 	}
 	cout << "Available Threads: " << ThreadCount << "   Using " << ThreadCountUsed << " Threads" << endl;
 	VoxelModel = loadModel();

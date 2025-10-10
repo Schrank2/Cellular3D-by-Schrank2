@@ -121,7 +121,6 @@ static void renderThread(int Thread, int yMin, int yMax) {
 	}
 }
 void render3D() {
-	if (Debug == true) { RenderTime = SDL_GetTicks(); }
 	// Zwischentextur für Antialiasing (Supersampling) resetten
 	SDL_SetRenderTarget(renderer, supersampleTex);
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
@@ -167,5 +166,4 @@ void render3D() {
 	SDL_SetRenderTarget(renderer, nullptr);
 	SDL_FRect rect = { 0,0,ScreenWidth,ScreenHeight };
 	SDL_RenderTexture(renderer, supersampleTex, nullptr, &rect);
-	if (Debug == true) { RenderTime = SDL_GetTicks() - RenderTime; }
 }

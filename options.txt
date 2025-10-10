@@ -2,7 +2,7 @@
 mapDensity=0.7
 # ScreenWidth and ScreenHeight must both be divisible by GameScale without a remainder, or parts of the Screen will remain empty.
 # The Dimensions of each tile in pixels
-GameScale=64
+GameScale=128
 # The width of the game window in pixels
 ScreenWidth=1600 
 # The height of the game window in pixels

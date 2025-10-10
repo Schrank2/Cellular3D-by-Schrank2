@@ -111,11 +111,19 @@ int game() {
 			std::swap(GameMap, GameMapNext); // Basically GameMap = GameMapNext; but Copilot says it's faster lol
 			if (Debug == true) { TickTime = SDL_GetTicks() - TickTime; }
 		}
+		// User Input
+		if (Debug == true) { InputTime = SDL_GetTicks(); }
 		inputHandler();
+		if (Debug == true) { InputTime = SDL_GetTicks() - InputTime; }
+		// rendering
 		if (Debug == true) { RenderTime = SDL_GetTicks(); }
 		render(GameMap);
 		if (Debug == true) { RenderTime = SDL_GetTicks() - RenderTime; }
-		if (Debug == true) { InputTime = SDL_GetTicks(); }
+		FrameTime = SDL_GetTicks() - FrameTime; // Frametime measurement end
+		// Debug Message
+		if (Debug == true) { cout << "----------------------------------------" << endl; }
+		if (Debug == true) { cout << "FPS: " << 1000.0f / FrameTime << "   FrameTime: " << FrameTime << "ms" << "   Rendering: " << RenderTime << "ms" << "   Voxels: " << RenderVoxelTime << "ms" << "   Rectangles: " << RenderRectangleTime << "ms" << "   RenderInit: " << RenderInitTime << "ms" << "   RenderPresent: " << RenderPresentTime << "ms" << endl; };
+		if (Debug == true) { cout << "TickTime: " << TickTime << "ms" << "   ReadVoxels: " << ReadVoxelTime << "ms" << "   DepthSorting: " << DepthSortTime << "ms" << "   Drawing: " << DrawTime << "ms" << "   InputTime: " << InputTime << "ms" << endl; }
 		// Cleanup
 		if (SDL_PollEvent(&event) && event.type == SDL_EVENT_QUIT) { break; }
 	}
