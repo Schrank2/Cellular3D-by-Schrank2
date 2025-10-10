@@ -113,7 +113,7 @@ inline static bool DrawTriangle(Triangle T) {
 	return true;
 }
 
-static void renderThread(int Thread, int yMin, int yMax) {
+static void renderThread(int yMin, int yMax) {
 	for (int i = yMin; i < yMax; i++) {
 		renderLock.lock(); // Used to avoid Deadlock Issue
 		renderModel(VoxelQueue[i]);
@@ -128,20 +128,20 @@ void render3D() {
 
 	readVoxels(GameMap);
 	if (Debug == true) { RenderVoxelTime = SDL_GetTicks(); }
-	for (int i = 0; i < VoxelQueue.size(); i++) {
-		renderModel(VoxelQueue[i]);
-	}
+	//for (int i = 0; i < VoxelQueue.size(); i++) {
+	//	renderModel(VoxelQueue[i]);
+	//}
 	if (Debug == true) { RenderVoxelTime = SDL_GetTicks() - RenderVoxelTime; }
 
 	// Rendering Multithreaded
 	if (Debug == true) { RenderRectangleTime = SDL_GetTicks(); }
 	RenderThreads.clear();
-	int rowLength = GameHeight / ThreadCountUsed;
+	int rowLength =  VoxelQueue.size() / ThreadCountUsed;
 	for (int i = 0; i < ThreadCountUsed; i++) {
 		int yMin = i * rowLength;
 		int yMax = (i == ThreadCountUsed - 1) ? GameHeight : (i + 1) * rowLength; // the last thread takes the remaining rows
 		// Start the thread to render the voxels
-		RenderThreads.emplace_back(renderThread, i, yMin, yMax);
+		RenderThreads.emplace_back(renderThread, yMin, yMax);
 
 	}
 	for (auto& th : RenderThreads) { th.join(); }; // Wait for the Rectangles to be calculated
