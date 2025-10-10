@@ -11,11 +11,12 @@ using namespace std;
 #include <tuple>
 mutex renderLock;
 vector<thread> RenderThreads;
-vector<TEXTUREMETA> TriangleTextures;
-vector<Triangle> TriangleQueue; // Queue for Triangles
-vector<vector<SDL_Vertex>> VerticieQueue; // Queue for the final triangles
 // Adding all Voxels to a list.
-std::vector<Voxel> VoxelQueue;
+vector<Voxel> VoxelQueue;
+vector<Triangle> TriangleQueue; // Queue for Triangles
+// Queue for the final triangles (first vector is for the Thread, second for the Triangle and third for the Vertex)
+vector<vector<vector<SDL_Vertex>>> VerticieQueue; 
+
 inline static void readVoxels(const std::vector<std::vector<std::vector<int>>>& GameMap) {
 	if (Debug == true) {ReadVoxelTime = SDL_GetTicks();}
 	// Clear the VoxelQueue
@@ -94,7 +95,7 @@ inline static float GetDepthDark(float A) {
 	A = 1 / A;
 	return A;
 }
-inline static bool DrawTriangle(Triangle T) {
+inline static bool DrawTriangle(Triangle T, int Thread) {
 	vector<SDL_Vertex> vertices(3);
 	SDL_FPoint A = {AAScale*ScreenCoordinateX(T.A.x,T.A.z), AAScale*ScreenCoordinateY(T.A.y,T.A.z)};
 	SDL_FPoint B = {AAScale*ScreenCoordinateX(T.B.x,T.B.z), AAScale*ScreenCoordinateY(T.B.y,T.B.z)};
@@ -109,7 +110,7 @@ inline static bool DrawTriangle(Triangle T) {
 	vertices[1].position = B;
 	vertices[2].position = C;
 	// Render to the Supersample Texture
-	VerticieQueue.emplace_back(vertices);
+	VerticieQueue[Thread].emplace_back(vertices);
 	return true;
 }
 
@@ -152,17 +153,26 @@ void render3D() {
 	if (Debug == true) { DepthSortTime = SDL_GetTicks() - DepthSortTime; }
 
 	// 2D-Project all Triangles
-	if (Debug == true) { DrawTime = SDL_GetTicks(); }
+	if (Debug == true) { DrawTime = SDL_GetTicks(); } // Draw Time Start
 	VerticieQueue.clear();
+	RenderThreads.clear();
+	for (int i = 0; i < ThreadCountUsed; i++) {
+		VerticieQueue.emplace_back(vector<vector<SDL_Vertex>>());
+	}
+	int rowlength = TriangleQueue.size() / ThreadCountUsed;
 	for (int i = 0; i < TriangleQueue.size(); i++) {
-		DrawTriangle(TriangleQueue[i]);
+		int ThreadID = i / rowlength;
+		DrawTriangle(TriangleQueue[i],ThreadID);
 	}
 	TriangleQueue.clear(); // Clear the Triangle Queue
-	if (Debug == true) { DrawTime = SDL_GetTicks() - DrawTime; }
 	SDL_SetRenderTarget(renderer, supersampleTex);
-	for (int i = 0; i < VerticieQueue.size(); i++) {
-		SDL_RenderGeometry(renderer, nullptr, VerticieQueue[i].data(), 3, nullptr, 0);
+	int t = 1; // Current Thread
+	for (int t = 0; t < VerticieQueue.size(); t++) {
+		for (int i = 0; i < VerticieQueue[t].size(); i++) {
+			SDL_RenderGeometry(renderer, nullptr, VerticieQueue[t][i].data(), 3, nullptr, 0);
+		}
 	}
+	if (Debug == true) { DrawTime = SDL_GetTicks() - DrawTime; } // Draw Time End
 	// Draw the Supersampled Texture to the screen
 	SDL_SetRenderTarget(renderer, nullptr);
 	SDL_FRect rect = { 0,0,ScreenWidth,ScreenHeight };
