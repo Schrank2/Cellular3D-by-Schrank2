@@ -127,6 +127,7 @@ void render3D() {
 	SDL_RenderClear(renderer); // Clear the Texture with white color
 	// reading the Voxels
 	readVoxels(GameMap);
+
 	// Rendering Multithreaded
 	if (Debug == true) { RenderRectangleTime = SDL_GetTicks(); }
 	RenderThreads.clear();
@@ -140,6 +141,7 @@ void render3D() {
 	}
 	for (auto& th : RenderThreads) { th.join(); }; // Wait for the Rectangles to be calculated
 	if (Debug == true) { RenderRectangleTime = SDL_GetTicks() - RenderRectangleTime; }
+
 	// Sort the Triangles by Depth
 	if (Debug == true) { DepthSortTime = SDL_GetTicks(); }
 	std::sort(TriangleQueue.begin(), TriangleQueue.end(), [](const Triangle& a, const Triangle& b) {
@@ -148,7 +150,8 @@ void render3D() {
 		return AVGzA > AVGzB;
 		});
 	if (Debug == true) { DepthSortTime = SDL_GetTicks() - DepthSortTime; }
-	// Render all Triangles
+
+	// Draw all Triangles
 	if (Debug == true) { DrawTime = SDL_GetTicks(); }
 	for (int i = 0; i < TriangleQueue.size(); i++) {
 		DrawTriangle(TriangleQueue[i]);
