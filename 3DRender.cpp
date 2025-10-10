@@ -13,6 +13,7 @@ mutex renderLock;
 vector<thread> RenderThreads;
 vector<TEXTUREMETA> TriangleTextures;
 vector<Triangle> TriangleQueue; // Queue for Triangles
+vector<vector<SDL_Vertex>> VerticieQueue; // Queue for the final triangles
 // Adding all Voxels to a list.
 std::vector<Voxel> VoxelQueue;
 inline static void readVoxels(const std::vector<std::vector<std::vector<int>>>& GameMap) {
@@ -108,8 +109,7 @@ inline static bool DrawTriangle(Triangle T) {
 	vertices[1].position = B;
 	vertices[2].position = C;
 	// Render to the Supersample Texture
-	SDL_SetRenderTarget(renderer, supersampleTex);
-	SDL_RenderGeometry(renderer, nullptr, vertices.data(), 3, nullptr, 0);
+	VerticieQueue.emplace_back(vertices);
 	return true;
 }
 
@@ -151,14 +151,18 @@ void render3D() {
 		});
 	if (Debug == true) { DepthSortTime = SDL_GetTicks() - DepthSortTime; }
 
-	// Draw all Triangles
+	// 2D-Project all Triangles
 	if (Debug == true) { DrawTime = SDL_GetTicks(); }
+	VerticieQueue.clear();
 	for (int i = 0; i < TriangleQueue.size(); i++) {
 		DrawTriangle(TriangleQueue[i]);
 	}
-	TriangleQueue.clear(); // Clear the Triangle Queue after rendering
+	TriangleQueue.clear(); // Clear the Triangle Queue
 	if (Debug == true) { DrawTime = SDL_GetTicks() - DrawTime; }
-	TriangleTextures.clear();
+	SDL_SetRenderTarget(renderer, supersampleTex);
+	for (int i = 0; i < VerticieQueue.size(); i++) {
+		SDL_RenderGeometry(renderer, nullptr, VerticieQueue[i].data(), 3, nullptr, 0);
+	}
 	// Draw the Supersampled Texture to the screen
 	SDL_SetRenderTarget(renderer, nullptr);
 	SDL_FRect rect = { 0,0,ScreenWidth,ScreenHeight };
