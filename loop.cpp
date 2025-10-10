@@ -122,7 +122,7 @@ int game() {
 		FrameTime = SDL_GetTicks() - FrameTime; // Frametime measurement end
 		// Debug Message
 		if (Debug == true) { cout << "----------------------------------------" << endl; }
-		if (Debug == true) { cout << "FPS: " << 1000.0f / FrameTime << "   FrameTime: " << FrameTime << "ms" << "   Rendering: " << RenderTime << "ms" << "   Voxels: " << RenderVoxelTime << "ms" << "   Rectangles: " << RenderRectangleTime << "ms" << "   RenderInit: " << RenderInitTime << "ms" << "   RenderPresent: " << RenderPresentTime << "ms" << endl; };
+		if (Debug == true) { cout << "FPS: " << 1000.0f / FrameTime << "   FrameTime: " << FrameTime << "ms" << "   Rendering: " << RenderTime << "ms" << "   Rectangles: " << RenderRectangleTime << "ms" << "   RenderInit: " << RenderInitTime << "ms" << "   RenderPresent: " << RenderPresentTime << "ms" << endl; };
 		if (Debug == true) { cout << "TickTime: " << TickTime << "ms" << "   ReadVoxels: " << ReadVoxelTime << "ms" << "   DepthSorting: " << DepthSortTime << "ms" << "   Drawing: " << DrawTime << "ms" << "   InputTime: " << InputTime << "ms" << endl; }
 		// Cleanup
 		if (SDL_PollEvent(&event) && event.type == SDL_EVENT_QUIT) { break; }

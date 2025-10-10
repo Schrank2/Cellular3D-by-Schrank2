@@ -125,14 +125,8 @@ void render3D() {
 	SDL_SetRenderTarget(renderer, supersampleTex);
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	SDL_RenderClear(renderer); // Clear the Texture with white color
-
+	// reading the Voxels
 	readVoxels(GameMap);
-	if (Debug == true) { RenderVoxelTime = SDL_GetTicks(); }
-	//for (int i = 0; i < VoxelQueue.size(); i++) {
-	//	renderModel(VoxelQueue[i]);
-	//}
-	if (Debug == true) { RenderVoxelTime = SDL_GetTicks() - RenderVoxelTime; }
-
 	// Rendering Multithreaded
 	if (Debug == true) { RenderRectangleTime = SDL_GetTicks(); }
 	RenderThreads.clear();
