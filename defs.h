@@ -66,7 +66,7 @@ extern float RenderRectangleTime;
 extern float TickTime;
 extern float ReadVoxelTime;
 extern float DepthSortTime;
-extern float DrawTime;
+extern float ProjectionTime;
 extern float InputTime;
 // Models
 extern std::vector<Triangle> VoxelModel;

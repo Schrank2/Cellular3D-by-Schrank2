@@ -13,6 +13,7 @@ float FrameTime;
 float TickTime;
 float InputTime;
 int LastTime;
+float ProjectionTime;
 // Camera Setup
 float CameraX = 0;
 float CameraY = 0;
@@ -123,7 +124,7 @@ int game() {
 		// Debug Message
 		if (Debug == true) { cout << "----------------------------------------" << endl; }
 		if (Debug == true) { cout << "FPS: " << 1000.0f / FrameTime << "   FrameTime: " << FrameTime << "ms" << "   Rendering: " << RenderTime << "ms" << "   Rectangles: " << RenderRectangleTime << "ms" << "   RenderInit: " << RenderInitTime << "ms" << "   RenderPresent: " << RenderPresentTime << "ms" << endl; };
-		if (Debug == true) { cout << "TickTime: " << TickTime << "ms" << "   ReadVoxels: " << ReadVoxelTime << "ms" << "   DepthSorting: " << DepthSortTime << "ms" << "   Drawing: " << DrawTime << "ms" << "   InputTime: " << InputTime << "ms" << endl; }
+		if (Debug == true) { cout << "TickTime: " << TickTime << "ms" << "   ReadVoxels: " << ReadVoxelTime << "ms" << "   DepthSorting: " << DepthSortTime << "ms" << "   3D to 2D Projection: " << ProjectionTime << "ms" << "   InputTime: " << InputTime << "ms" << endl; }
 		// Cleanup
 		if (SDL_PollEvent(&event) && event.type == SDL_EVENT_QUIT) { break; }
 	}
