@@ -113,15 +113,11 @@ inline static vector<SDL_Vertex> DrawTriangle(Triangle T) {
 	return vertices;
 }
 inline static void DrawTriangleThread(int Thread, int rowLength) {
-	vector<vector<SDL_Vertex>> verticeList;
 	int Min = Thread * rowLength;
 	int Max = (Thread + 1) * rowLength;
 	for (int i = Min; i < Max; i++) {
-		verticeList.emplace_back(DrawTriangle(TriangleQueue[i]));
+		VerticieQueue[Thread].emplace_back(DrawTriangle(TriangleQueue[i]));
 	}
-	renderLock.lock(); // Used to avoid Deadlock Issue
-	VerticieQueue[Thread] = verticeList;
-	renderLock.unlock();
 }
 
 static void renderThread(int yMin, int yMax) {
@@ -163,7 +159,7 @@ void render3D() {
 	if (Debug == true) { DepthSortTime = SDL_GetTicks() - DepthSortTime; }
 
 	// 2D-Project all Triangles
-	if (Debug == true) { ProjectionTime = SDL_GetTicks(); } // Draw Time Start
+	if (Debug == true) { ProjectionTime = SDL_GetTicks(); } // Projection Time Start
 	VerticieQueue.clear();
 	for (int i = 0; i < ThreadCountUsed; i++) {
 		VerticieQueue.emplace_back(vector<vector<SDL_Vertex>>());
@@ -181,7 +177,7 @@ void render3D() {
 			SDL_RenderGeometry(renderer, nullptr, VerticieQueue[t][i].data(), 3, nullptr, 0);
 		}
 	}
-	if (Debug == true) { ProjectionTime = SDL_GetTicks() - ProjectionTime; } // Draw Time End
+	if (Debug == true) { ProjectionTime = SDL_GetTicks() - ProjectionTime; } // Projection Time End
 	// Draw the Supersampled Texture to the screen
 	SDL_SetRenderTarget(renderer, nullptr);
 	SDL_FRect rect = { 0,0,ScreenWidth,ScreenHeight };

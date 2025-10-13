@@ -1,5 +1,6 @@
 #include <SDL3/SDL.h>
 #include <vector>
+#include <thread>
 #ifndef COMMON_H
 #define COMMON_H
 // Structs
@@ -55,6 +56,7 @@ extern SDL_Renderer* renderer;
 extern SDL_Event event;
 extern std::vector<std::vector<std::vector<int>>> GameMap;
 extern std::vector<std::vector<std::vector<int>>> GameMapNext;
+extern std::vector<std::thread> ThreadPool;
 // Debug Logs
 extern float TaskTime;
 extern float FrameTime;

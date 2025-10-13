@@ -26,6 +26,7 @@ SDL_Event event;
 SDL_Texture* supersampleTex;
 SDL_Window* window;
 SDL_Renderer* renderer;
+vector<thread> ThreadPool;
 vector<vector<vector<int>>> GameMap;
 vector<vector<vector<int>>> GameMapNext;
 vector<Triangle> VoxelModel;
@@ -73,6 +74,7 @@ int main(int argc, char* argv[])
 	ThreadCount = thread::hardware_concurrency();
 	ThreadCountUsed; // Number of threads used
 	ThreadCountUsed = ThreadCount * ThreadCountUsage;
+	for (int i = 0; i < ThreadCountUsed; i++) { ThreadPool.emplace_back(); }
 	GameMap.resize(GameWidth, vector<vector<int>>(GameHeight, vector<int>(GameDepth)));
 	GameMapNext.resize(GameWidth, vector<vector<int>>(GameHeight, vector<int>(GameDepth)));
 	if (Debug == true) { cout << "Successfully Read Settings" << endl; }

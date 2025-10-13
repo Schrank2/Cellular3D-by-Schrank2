@@ -32,7 +32,6 @@ const int neighborOffsets[24][3] = {
 	{-1, 0, 1},           { 1, 0, 1},
 	{-1, 1, 1},{ 0, 1, 1},{ 1, 1, 1}
 };
-std::vector<thread> threads;
 inline static void CellularAutomataRules(int txMin,int txMax,int tyMin, int tyMax) {
 	// Cellular Automata do stuff now
 	int survive; int neighbors;
@@ -100,14 +99,13 @@ int game() {
 				}
 			}
 			// Cellular Automata Logic
-			threads.clear();
 			int rowLength = GameHeight / ThreadCountUsed;
 			for (int i = 0; i < ThreadCountUsed; i++) {
 				int yMin = i * rowLength;
 				int yMax = (i == ThreadCountUsed - 1) ? GameHeight : (i + 1) * rowLength; // the last thread takes the remaining rows
-				threads.emplace_back(CellularAutomataRules, 0, GameWidth, yMin, yMax);
+				ThreadPool[i] = { CellularAutomataRules, 0, GameWidth, yMin, yMax };
 			}
-			for (auto& th : threads) { th.join(); };
+			for (auto& th : ThreadPool) { th.join(); };
 			// Apply Changes
 			std::swap(GameMap, GameMapNext); // Basically GameMap = GameMapNext; but Copilot says it's faster lol
 			if (Debug == true) { TickTime = SDL_GetTicks() - TickTime; }
