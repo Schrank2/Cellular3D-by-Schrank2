@@ -137,16 +137,15 @@ void render3D() {
 
 	// Rendering Multithreaded
 	if (Debug == true) { RenderRectangleTime = SDL_GetTicks(); }
-	RenderThreads.clear();
 	int rowLengthVoxel =  VoxelQueue.size() / ThreadCountUsed;
 	for (int i = 0; i < ThreadCountUsed; i++) {
 		int yMin = i * rowLengthVoxel;
 		int yMax = (i == ThreadCountUsed - 1) ? GameHeight : (i + 1) * rowLengthVoxel; // the last thread takes the remaining rows
 		// Start the thread to render the voxels
-		RenderThreads.emplace_back(renderThread, yMin, yMax);
+		ThreadPool[i] = thread(renderThread, yMin, yMax);
 
 	}
-	for (auto& th : RenderThreads) { th.join(); }; // Wait for the Rectangles to be calculated
+	for (auto& th : ThreadPool) { th.join(); }; // Wait for the Rectangles to be calculated
 	if (Debug == true) { RenderRectangleTime = SDL_GetTicks() - RenderRectangleTime; }
 
 	// Sort the Triangles by Depth
@@ -164,12 +163,11 @@ void render3D() {
 	for (int i = 0; i < ThreadCountUsed; i++) {
 		VerticieQueue.emplace_back(vector<vector<SDL_Vertex>>());
 	}
-	RenderThreads.clear();
 	int rowLengthTriangle = TriangleQueue.size() / ThreadCountUsed;
 	for (int i = 0; i < ThreadCountUsed; i++) {
-		RenderThreads.emplace_back(DrawTriangleThread, i, rowLengthTriangle);
+		ThreadPool[i] = thread(DrawTriangleThread, i, rowLengthTriangle);
 	}
-	for (auto& th : RenderThreads) { th.join(); };
+	for (auto& th : ThreadPool) { th.join(); };
 	TriangleQueue.clear(); // Clear the Triangle Queue
 	SDL_SetRenderTarget(renderer, supersampleTex);
 	for (int t = 0; t < VerticieQueue.size(); t++) {
