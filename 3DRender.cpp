@@ -112,11 +112,38 @@ inline static vector<SDL_Vertex> DrawTriangle(Triangle T) {
 	// Render to the Supersample Texture
 	return vertices;
 }
-inline static void DrawTriangleThread(int Thread, int rowLength) {
-	int Min = Thread * rowLength;
-	int Max = (Thread + 1) * rowLength;
+inline static void ProjectionThread(int Min, int Max, int Thread) {
 	for (int i = Min; i < Max; i++) {
 		VerticieQueue[Thread].emplace_back(DrawTriangle(TriangleQueue[i]));
+	}
+}
+inline static void ProjectionMultithreaded() {
+	// Clear the Verticie Queue
+	VerticieQueue.clear();
+	for (int i = 0; i < ThreadCountUsed; i++) {
+		VerticieQueue.emplace_back(vector<vector<SDL_Vertex>>());
+	}
+	int rowLength = TriangleQueue.size() / ThreadCountUsed;
+	for (int i = 0; i < ThreadCountUsed; i++) {
+		int Min = i * rowLength;
+		int Max = (i + 1) * rowLength;
+		ThreadPool[i] = thread(ProjectionThread, Min, Max, i);
+	}
+	for (auto& th : ThreadPool) { th.join(); };
+}
+inline static void ProjectionSinglethreaded() {
+	// Clear the Verticie Queue
+	VerticieQueue.clear();
+	for (int i = 0; i < ThreadCountUsed; i++) {
+		VerticieQueue.emplace_back(vector<vector<SDL_Vertex>>());
+	}
+	int rowLength = TriangleQueue.size() / ThreadCountUsed;
+	for (int i = 0; i < ThreadCountUsed; i++) {
+		int Min = i * rowLength;
+		int Max = (i + 1) * rowLength;
+		for (int j = Min; j < Max; j++) {
+			VerticieQueue[i].emplace_back(DrawTriangle(TriangleQueue[j]));
+		}
 	}
 }
 
@@ -159,15 +186,8 @@ void render3D() {
 
 	// 2D-Project all Triangles
 	if (Debug == true) { ProjectionTime = SDL_GetTicks(); } // Projection Time Start
-	VerticieQueue.clear();
-	for (int i = 0; i < ThreadCountUsed; i++) {
-		VerticieQueue.emplace_back(vector<vector<SDL_Vertex>>());
-	}
-	int rowLengthTriangle = TriangleQueue.size() / ThreadCountUsed;
-	for (int i = 0; i < ThreadCountUsed; i++) {
-		ThreadPool[i] = thread(DrawTriangleThread, i, rowLengthTriangle);
-	}
-	for (auto& th : ThreadPool) { th.join(); };
+	ProjectionMultithreaded();
+	//ProjectionSinglethreaded();
 	TriangleQueue.clear(); // Clear the Triangle Queue
 	SDL_SetRenderTarget(renderer, supersampleTex);
 	for (int t = 0; t < VerticieQueue.size(); t++) {
