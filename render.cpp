@@ -16,6 +16,7 @@ float RenderPresentTime = 0.0f;
 float ReadVoxelTime;
 float DepthSortTime;
 float DrawTime;
+float RenderGeometryTime;
 vector<vector<SDL_FRect>> RenderRects(ThreadCountUsed);
 
 void render(const vector<vector<vector<int>>>& GameMap) {

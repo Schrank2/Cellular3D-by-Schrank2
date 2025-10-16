@@ -65,6 +65,7 @@ extern float RenderInitTime;
 extern float RenderVoxelTime;
 extern float RenderPresentTime;
 extern float RenderRectangleTime;
+extern float RenderGeometryTime;
 extern float TickTime;
 extern float ReadVoxelTime;
 extern float DepthSortTime;

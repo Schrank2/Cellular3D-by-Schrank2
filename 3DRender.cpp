@@ -8,15 +8,14 @@ using namespace std;
 #include <thread>
 #include <mutex>
 #include <algorithm>
-#include <tuple>
 mutex renderLock;
 vector<thread> RenderThreads;
 // Adding all Voxels to a list.
 vector<Voxel> VoxelQueue;
 vector<Triangle> TriangleQueue; // Queue for Triangles
 // Queue for the final triangles (first vector is for the Thread, second for the Triangle and third for the Vertex)
-vector<vector<vector<SDL_Vertex>>> VerticieQueue; // VerticieQueue for Multithreading
-vector<vector<SDL_Vertex>> VerticieQueueS; // VerticieQueue for Singlethreading
+vector<vector<SDL_Vertex>> VerticieQueue; // VerticieQueue for Multithreading
+vector<SDL_Vertex> VerticieQueueS; // VerticieQueue for Singlethreading
 
 inline static void readVoxels(const std::vector<std::vector<std::vector<int>>>& GameMap) {
 	if (Debug == true) {ReadVoxelTime = SDL_GetTicks();}
@@ -110,23 +109,25 @@ inline static vector<SDL_Vertex> DrawTriangle(Triangle T) {
 	vertices[0].position = A;
 	vertices[1].position = B;
 	vertices[2].position = C;
-	// Render to the Supersample Texture
 	return vertices;
 }
-inline static void ProjectionThread(int Min, int Max, int Thread) {
-	vector<vector<SDL_Vertex>> temp;
+inline static void ProjectionThread(int Min, int Max, int Thread) { // some Autopilot but I tried to understand it
+	vector<SDL_Vertex> temp;
+	temp.reserve((Max - Min) * 3); // avoid misallocations
 	for (int i = Min; i < Max; i++) {
-		temp.emplace_back(DrawTriangle(TriangleQueue[i]));
+		vector<SDL_Vertex> verts = DrawTriangle(TriangleQueue[i]); // returns 3 vertices
+		temp.insert(temp.end(), verts.begin(), verts.end()); // inserts 3 vertices into temp
+		
 	}
-	renderLock.lock();
-	VerticieQueue[Thread] = temp;
-	renderLock.unlock();
+	// move is faster than a copy, therefore:
+	VerticieQueue[Thread] = move(temp); // move temp to the correct position in VerticieQueue
+	// so I just dont put each triangle into its own vector, but I just reserve memory for the three verticies
 }
 inline static void ProjectionMultithreaded() {
 	// Clear the Verticie Queue
 	VerticieQueue.clear();
 	for (int i = 0; i < ThreadCountUsed; i++) {
-		VerticieQueue.emplace_back(vector<vector<SDL_Vertex>>());
+		VerticieQueue.emplace_back(vector<SDL_Vertex>());
 	}
 	int rowLength = TriangleQueue.size() / ThreadCountUsed;
 	for (int i = 0; i < ThreadCountUsed; i++) {
@@ -136,11 +137,14 @@ inline static void ProjectionMultithreaded() {
 	}
 	for (auto& th : ThreadPool) { th.join(); };
 }
-inline static void ProjectionSinglethreaded() {
+inline static void ProjectionSinglethreaded() { // inspired by Autopilot in Projectionmultithreaded, but no direct Autoplilot here
 	// Clear the Verticie Queue
 	VerticieQueueS.clear();
+	vector<SDL_Vertex> temp;
+	//VerticieQueueS.reserve(TriangleQueue.size() * 3); // reserve memory for all verticies
 	for (int i = 0; i < TriangleQueue.size(); i++) {
-		VerticieQueueS.emplace_back(DrawTriangle(TriangleQueue[i]));
+		temp = DrawTriangle(TriangleQueue[i]);
+		VerticieQueueS.insert(VerticieQueueS.end(), temp.begin(), temp.end());
 	}
 }
 
@@ -167,7 +171,6 @@ void render3D() {
 		int yMax = (i == ThreadCountUsed - 1) ? GameHeight : (i + 1) * rowLengthVoxel; // the last thread takes the remaining rows
 		// Start the thread to render the voxels
 		ThreadPool[i] = thread(renderThread, yMin, yMax);
-
 	}
 	for (auto& th : ThreadPool) { th.join(); }; // Wait for the Rectangles to be calculated
 	if (Debug == true) { RenderRectangleTime = SDL_GetTicks() - RenderRectangleTime; }
@@ -183,16 +186,16 @@ void render3D() {
 
 	// 2D-Project all Triangles
 	if (Debug == true) { ProjectionTime = SDL_GetTicks(); } // Projection Time Start
-	ProjectionMultithreaded();
-	//ProjectionSinglethreaded();
+	//ProjectionMultithreaded();
+	ProjectionSinglethreaded();
 	TriangleQueue.clear(); // Clear the Triangle Queue
 	SDL_SetRenderTarget(renderer, supersampleTex);
-	for (int t = 0; t < VerticieQueue.size(); t++) {
-		for (int i = 0; i < VerticieQueue[t].size(); i++) {
-			SDL_RenderGeometry(renderer, nullptr, VerticieQueue[t][i].data(), 3, nullptr, 0);
-		}
-	}
 	if (Debug == true) { ProjectionTime = SDL_GetTicks() - ProjectionTime; } // Projection Time End
+	if (Debug == true) { RenderGeometryTime = SDL_GetTicks(); } // Final RenderGeometry Time Start
+	//for (int t = 0; t < VerticieQueueS.size(); t++) {
+	SDL_RenderGeometry(renderer, nullptr, VerticieQueueS.data(), VerticieQueueS.size(), nullptr, 0);
+	//}
+	if (Debug == true) { RenderGeometryTime = SDL_GetTicks() - RenderGeometryTime; } // Final Rendergeometry Time End
 	// Draw the Supersampled Texture to the screen
 	SDL_SetRenderTarget(renderer, nullptr);
 	SDL_FRect rect = { 0,0,ScreenWidth,ScreenHeight };
