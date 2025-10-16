@@ -114,9 +114,13 @@ inline static vector<SDL_Vertex> DrawTriangle(Triangle T) {
 	return vertices;
 }
 inline static void ProjectionThread(int Min, int Max, int Thread) {
+	vector<vector<SDL_Vertex>> temp;
 	for (int i = Min; i < Max; i++) {
-		VerticieQueue[Thread].emplace_back(DrawTriangle(TriangleQueue[i]));
+		temp.emplace_back(DrawTriangle(TriangleQueue[i]));
 	}
+	renderLock.lock();
+	VerticieQueue[Thread] = temp;
+	renderLock.unlock();
 }
 inline static void ProjectionMultithreaded() {
 	// Clear the Verticie Queue
@@ -179,8 +183,8 @@ void render3D() {
 
 	// 2D-Project all Triangles
 	if (Debug == true) { ProjectionTime = SDL_GetTicks(); } // Projection Time Start
-	//ProjectionMultithreaded();
-	ProjectionSinglethreaded();
+	ProjectionMultithreaded();
+	//ProjectionSinglethreaded();
 	TriangleQueue.clear(); // Clear the Triangle Queue
 	SDL_SetRenderTarget(renderer, supersampleTex);
 	for (int t = 0; t < VerticieQueue.size(); t++) {
