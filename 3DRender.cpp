@@ -15,7 +15,8 @@ vector<thread> RenderThreads;
 vector<Voxel> VoxelQueue;
 vector<Triangle> TriangleQueue; // Queue for Triangles
 // Queue for the final triangles (first vector is for the Thread, second for the Triangle and third for the Vertex)
-vector<vector<vector<SDL_Vertex>>> VerticieQueue; 
+vector<vector<vector<SDL_Vertex>>> VerticieQueue; // VerticieQueue for Multithreading
+vector<vector<SDL_Vertex>> VerticieQueueS; // VerticieQueue for Singlethreading
 
 inline static void readVoxels(const std::vector<std::vector<std::vector<int>>>& GameMap) {
 	if (Debug == true) {ReadVoxelTime = SDL_GetTicks();}
@@ -133,17 +134,9 @@ inline static void ProjectionMultithreaded() {
 }
 inline static void ProjectionSinglethreaded() {
 	// Clear the Verticie Queue
-	VerticieQueue.clear();
-	for (int i = 0; i < ThreadCountUsed; i++) {
-		VerticieQueue.emplace_back(vector<vector<SDL_Vertex>>());
-	}
-	int rowLength = TriangleQueue.size() / ThreadCountUsed;
-	for (int i = 0; i < ThreadCountUsed; i++) {
-		int Min = i * rowLength;
-		int Max = (i + 1) * rowLength;
-		for (int j = Min; j < Max; j++) {
-			VerticieQueue[i].emplace_back(DrawTriangle(TriangleQueue[j]));
-		}
+	VerticieQueueS.clear();
+	for (int i = 0; i < TriangleQueue.size(); i++) {
+		VerticieQueueS.emplace_back(DrawTriangle(TriangleQueue[i]));
 	}
 }
 
@@ -186,8 +179,8 @@ void render3D() {
 
 	// 2D-Project all Triangles
 	if (Debug == true) { ProjectionTime = SDL_GetTicks(); } // Projection Time Start
-	ProjectionMultithreaded();
-	//ProjectionSinglethreaded();
+	//ProjectionMultithreaded();
+	ProjectionSinglethreaded();
 	TriangleQueue.clear(); // Clear the Triangle Queue
 	SDL_SetRenderTarget(renderer, supersampleTex);
 	for (int t = 0; t < VerticieQueue.size(); t++) {
