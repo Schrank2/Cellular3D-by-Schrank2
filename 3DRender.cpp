@@ -95,7 +95,7 @@ inline static float GetDepthDark(float A) {
 	A = 1 / A;
 	return A;
 }
-inline static vector<SDL_Vertex> DrawTriangle(Triangle T) {
+inline static void DrawTriangle(Triangle T, SDL_Vertex* Output) {
 	vector<SDL_Vertex> vertices(3);
 	SDL_FPoint A = {AAScale*ScreenCoordinateX(T.A.x,T.A.z), AAScale*ScreenCoordinateY(T.A.y,T.A.z)};
 	SDL_FPoint B = {AAScale*ScreenCoordinateX(T.B.x,T.B.z), AAScale*ScreenCoordinateY(T.B.y,T.B.z)};
@@ -109,7 +109,6 @@ inline static vector<SDL_Vertex> DrawTriangle(Triangle T) {
 	vertices[0].position = A;
 	vertices[1].position = B;
 	vertices[2].position = C;
-	return vertices;
 }
 inline static void ProjectionThread(int Min, int Max, int Thread) { // some Autopilot but I tried to understand it
 	vector<SDL_Vertex> temp;
@@ -141,13 +140,12 @@ inline static void ProjectionSinglethreaded() { // inspired by Autopilot in Proj
 	// Clear the Verticie Queue
 	VerticieQueueS.clear();
 	vector<SDL_Vertex> temp;
-	//VerticieQueueS.reserve(TriangleQueue.size() * 3); // reserve memory for all verticies
+	VerticieQueueS.reserve(TriangleQueue.size() * 3); // resize memory for all verticies
 	for (int i = 0; i < TriangleQueue.size(); i++) {
 		temp = DrawTriangle(TriangleQueue[i]);
 		VerticieQueueS.insert(VerticieQueueS.end(), temp.begin(), temp.end());
 	}
 }
-
 static void renderThread(int yMin, int yMax) {
 	for (int i = yMin; i < yMax; i++) {
 		renderLock.lock(); // Used to avoid Deadlock Issue
@@ -191,11 +189,13 @@ void render3D() {
 	TriangleQueue.clear(); // Clear the Triangle Queue
 	SDL_SetRenderTarget(renderer, supersampleTex);
 	if (Debug == true) { ProjectionTime = SDL_GetTicks() - ProjectionTime; } // Projection Time End
+
 	if (Debug == true) { RenderGeometryTime = SDL_GetTicks(); } // Final RenderGeometry Time Start
 	//for (int t = 0; t < VerticieQueueS.size(); t++) {
 	SDL_RenderGeometry(renderer, nullptr, VerticieQueueS.data(), VerticieQueueS.size(), nullptr, 0);
 	//}
 	if (Debug == true) { RenderGeometryTime = SDL_GetTicks() - RenderGeometryTime; } // Final Rendergeometry Time End
+	
 	// Draw the Supersampled Texture to the screen
 	SDL_SetRenderTarget(renderer, nullptr);
 	SDL_FRect rect = { 0,0,ScreenWidth,ScreenHeight };
