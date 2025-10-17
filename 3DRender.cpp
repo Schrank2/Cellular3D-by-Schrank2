@@ -115,7 +115,6 @@ inline static void ProjectionThread(int Min, int Max, int Thread) { // some Auto
 	for (int i = Min; i < Max; i++) {
 		vector<SDL_Vertex> verts = DrawTriangle(TriangleQueue[i]); // returns 3 vertices
 		temp.insert(temp.end(), verts.begin(), verts.end()); // inserts 3 vertices into temp
-		
 	}
 	// move is faster than a copy, therefore:
 	VerticieQueue[Thread] = move(temp); // move temp to the correct position in VerticieQueue
@@ -124,9 +123,7 @@ inline static void ProjectionThread(int Min, int Max, int Thread) { // some Auto
 inline static void ProjectionMultithreaded() {
 	// Clear the Verticie Queue
 	VerticieQueue.clear();
-	for (int i = 0; i < ThreadCountUsed; i++) {
-		VerticieQueue.emplace_back(vector<SDL_Vertex>());
-	}
+	VerticieQueue.resize(ThreadCountUsed);
 	int rowLength = TriangleQueue.size() / ThreadCountUsed;
 	for (int i = 0; i < ThreadCountUsed; i++) {
 		int Min = i * rowLength;
@@ -183,16 +180,22 @@ void render3D() {
 
 	// 2D-Project all Triangles
 	if (Debug == true) { ProjectionTime = SDL_GetTicks(); } // Projection Time Start
-	//ProjectionMultithreaded();
-	ProjectionSinglethreaded();
+	ProjectionMultithreaded();
+	//ProjectionSinglethreaded();
 	TriangleQueue.clear(); // Clear the Triangle Queue
 	SDL_SetRenderTarget(renderer, supersampleTex);
 	if (Debug == true) { ProjectionTime = SDL_GetTicks() - ProjectionTime; } // Projection Time End
 
 	if (Debug == true) { RenderGeometryTime = SDL_GetTicks(); } // Final RenderGeometry Time Start
-	//for (int t = 0; t < VerticieQueueS.size(); t++) {
-	SDL_RenderGeometry(renderer, nullptr, VerticieQueueS.data(), VerticieQueueS.size(), nullptr, 0);
-	//}
+	if (Multithreading){
+		for (int t = 0; t < VerticieQueue.size(); t++) {
+			SDL_RenderGeometry(renderer, nullptr, VerticieQueue[t].data(), VerticieQueue[t].size(), nullptr, 0);
+		}
+	}
+	if (!Multithreading){ 
+		SDL_RenderGeometry(renderer, nullptr, VerticieQueueS.data(), VerticieQueueS.size(), nullptr, 0);
+	}
+	
 	if (Debug == true) { RenderGeometryTime = SDL_GetTicks() - RenderGeometryTime; } // Final Rendergeometry Time End
 	
 	// Draw the Supersampled Texture to the screen

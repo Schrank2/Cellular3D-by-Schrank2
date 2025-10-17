@@ -83,4 +83,5 @@ extern int TickInterval; // Time between game ticks in milliseconds
 extern bool Debug; // Should debug messages be printed to the console
 extern float shadingStrength; // Strength of the shading based on depth
 extern int AAScale; // Antialiasing strength, 1 = none, 2 = 2x, 3 = 3x, 4 = 4x
+extern bool Multithreading;
 #endif

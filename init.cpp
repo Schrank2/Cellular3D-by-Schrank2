@@ -16,6 +16,7 @@ float ThreadCountUsage;
 float shadingStrength; // Strength of the shading based on depth
 int TickInterval;
 bool Debug;
+bool Multithreading = true;
 int GameWidth;
 int AAScale = 2; // 1 = none, 2 = 2x, 3 = 3x, 4 = 4x
 int GameHeight;
