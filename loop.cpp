@@ -127,6 +127,7 @@ int game() {
 		if (Debug == true) { cout << "FPS: " << 1000.0f / FrameTime << "   FrameTime: " << FrameTime << "ms" << "   Rendering: " << RenderTime << "ms" << "   Rectangles: " << RenderRectangleTime << "ms" << "   RenderInit: " << RenderInitTime << "ms" << "   RenderPresent: " << RenderPresentTime << "ms" << endl; };
 		if (Debug == true) { cout << "TickTime: " << TickTime << "ms" << "   ReadVoxels: " << ReadVoxelTime << "ms" << "   DepthSorting: " << DepthSortTime << "ms" << "   3D to 2D Projection: " << ProjectionTime << "ms" << "   Rendergeometry: " << RenderGeometryTime << "ms" << "   InputTime: " << InputTime << "ms" << endl; }
 		if (Debug == true) { cout << "Multithreading" << Multithreading << endl; }
+		cout << "Yaw,Pitch: " << C1.yaw << "," << C1.pitch << endl;
 		// Cleanup
 		if (SDL_PollEvent(&event) && event.type == SDL_EVENT_QUIT) { break; }
 	}

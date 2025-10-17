@@ -24,8 +24,8 @@ struct TEXTUREMETA {
 	TEXTUREMETA(SDL_Texture* texture, SDL_FRect rect) : texture(texture), rect(rect) {}
 };
 struct KEYBOARD {
-	bool W, A, S, D, LSHIFT, SPACE;
-	KEYBOARD(bool W, bool A, bool S, bool D, bool LSHIFT, bool SPACE) : W(W),A(A),S(S),D(D),LSHIFT(LSHIFT),SPACE(SPACE) {}
+	bool W, A, S, D, LSHIFT, SPACE, C, V;
+	KEYBOARD(bool W, bool A, bool S, bool D, bool LSHIFT, bool SPACE, bool C, bool V) : W(W),A(A),S(S),D(D),LSHIFT(LSHIFT),SPACE(SPACE), C(C), V(V) {}
 };
 // Misc
 extern int CurrentTime;

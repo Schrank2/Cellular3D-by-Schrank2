@@ -31,7 +31,7 @@ vector<thread> ThreadPool;
 vector<vector<vector<int>>> GameMap;
 vector<vector<vector<int>>> GameMapNext;
 vector<Triangle> VoxelModel;
-Camera C1 = Camera(0, 0, -20, 0, 0, 0,0,0);
+Camera C1 = Camera(0.0f, 0.0f, -20, 0.0f, 0.0f, 0,0.0f,0.0f);
 static vector<Triangle> loadModel() {
 	// Setting up Voxel Model
 	vector<Triangle> Model;

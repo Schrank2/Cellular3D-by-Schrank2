@@ -46,6 +46,10 @@ inline static float ScreenCoordinateX(float x, float z) {
 	int offset = ScreenWidth * 0.5;
 	return  a + offset;
 }
+inline static void RotateCameraOffset(POS3D point) {
+
+}
+
 inline static float ScreenCoordinateY(float y, float z) {
 	float Depth = 1+z-C1.z; // Adjusting depth for perspective
 	int a = ScreenWidth * (y + C1.y) / Depth;
