@@ -95,20 +95,19 @@ inline static float GetDepthDark(float A) {
 	A = 1 / A;
 	return A;
 }
-inline static void DrawTriangle(Triangle T, SDL_Vertex* Output) {
-	vector<SDL_Vertex> vertices(3);
-	SDL_FPoint A = {AAScale*ScreenCoordinateX(T.A.x,T.A.z), AAScale*ScreenCoordinateY(T.A.y,T.A.z)};
-	SDL_FPoint B = {AAScale*ScreenCoordinateX(T.B.x,T.B.z), AAScale*ScreenCoordinateY(T.B.y,T.B.z)};
-	SDL_FPoint C = {AAScale*ScreenCoordinateX(T.C.x,T.C.z), AAScale*ScreenCoordinateY(T.C.y,T.C.z)};
-	float c = GetDepthDark(T.A.z);
-	vertices[0].color = { T.color.r * c,T.color.g * c,T.color.b * c,T.color.a };
+inline static vector<SDL_Vertex> DrawTriangle(Triangle T) {
+	vector<SDL_Vertex> Vert(3);
+	float c;
+	Vert[0].position = {AAScale * ScreenCoordinateX(T.A.x,T.A.z), AAScale * ScreenCoordinateY(T.A.y,T.A.z)};
+	Vert[1].position = {AAScale * ScreenCoordinateX(T.B.x,T.B.z), AAScale * ScreenCoordinateY(T.B.y,T.B.z)};
+	Vert[2].position = {AAScale * ScreenCoordinateX(T.C.x,T.C.z), AAScale * ScreenCoordinateY(T.C.y,T.C.z)};
+	c = GetDepthDark(T.A.z);
+	Vert[0].color = {T.color.r * c,T.color.g * c,T.color.b * c,T.color.a};
 	c = GetDepthDark(T.B.z);
-	vertices[1].color = { T.color.r * c,T.color.g * c,T.color.b * c,T.color.a };
+	Vert[1].color = {T.color.r * c,T.color.g * c,T.color.b * c,T.color.a};
 	c = GetDepthDark(T.C.z);
-	vertices[2].color = { T.color.r * c,T.color.g * c,T.color.b * c,T.color.a };
-	vertices[0].position = A;
-	vertices[1].position = B;
-	vertices[2].position = C;
+	Vert[3].color = {T.color.r * c,T.color.g * c,T.color.b * c,T.color.a};
+	return Vert;
 }
 inline static void ProjectionThread(int Min, int Max, int Thread) { // some Autopilot but I tried to understand it
 	vector<SDL_Vertex> temp;
