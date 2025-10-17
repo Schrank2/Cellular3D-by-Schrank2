@@ -46,7 +46,9 @@ struct Camera {
 	float vx;
 	float vy;
 	float vz;
-	Camera(float x,float y, float z,float vx,float vy, float vz) : x(x),y(y),z(z),vx(vx),vy(vy),vz(vz) {}
+	float pitch;
+	float yaw;
+	Camera(float x,float y, float z,float vx,float vy, float vz, float pitch, float yaw) : x(x),y(y),z(z),vx(vx),vy(vy),vz(vz),pitch(pitch),yaw(yaw) {}
 };
 extern Camera C1;
 
