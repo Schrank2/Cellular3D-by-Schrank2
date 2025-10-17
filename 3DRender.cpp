@@ -8,6 +8,7 @@ using namespace std;
 #include <thread>
 #include <mutex>
 #include <algorithm>
+#include <array>
 mutex renderLock;
 vector<thread> RenderThreads;
 // Adding all Voxels to a list.
@@ -95,8 +96,8 @@ inline static float GetDepthDark(float A) {
 	A = 1 / A;
 	return A;
 }
-inline static vector<SDL_Vertex> DrawTriangle(Triangle T) {
-	vector<SDL_Vertex> Vert(3);
+inline static array<SDL_Vertex, 3> DrawTriangle(Triangle T) {
+	array<SDL_Vertex, 3> Vert;
 	float c;
 	Vert[0].position = {AAScale * ScreenCoordinateX(T.A.x,T.A.z), AAScale * ScreenCoordinateY(T.A.y,T.A.z)};
 	Vert[1].position = {AAScale * ScreenCoordinateX(T.B.x,T.B.z), AAScale * ScreenCoordinateY(T.B.y,T.B.z)};
@@ -113,8 +114,10 @@ inline static void ProjectionThread(int Min, int Max, int Thread) { // some Auto
 	vector<SDL_Vertex> temp;
 	temp.reserve((Max - Min) * 3); // avoid misallocations
 	for (int i = Min; i < Max; i++) {
-		vector<SDL_Vertex> verts = DrawTriangle(TriangleQueue[i]); // returns 3 vertices
-		temp.insert(temp.end(), verts.begin(), verts.end()); // inserts 3 vertices into temp
+		array<SDL_Vertex, 3> verts = DrawTriangle(TriangleQueue[i]); // returns 3 vertices
+		temp.push_back(verts[0]);
+		temp.push_back(verts[1]);
+		temp.push_back(verts[2]);
 	}
 	// move is faster than a copy, therefore:
 	VerticieQueue[Thread] = move(temp); // move temp to the correct position in VerticieQueue
@@ -126,9 +129,7 @@ inline static void ProjectionMultithreaded() {
 	VerticieQueue.resize(ThreadCountUsed);
 	int rowLength = TriangleQueue.size() / ThreadCountUsed;
 	for (int i = 0; i < ThreadCountUsed; i++) {
-		int Min = i * rowLength;
-		int Max = (i + 1) * rowLength;
-		ThreadPool[i] = thread(ProjectionThread, Min, Max, i);
+		ThreadPool[i] = thread(ProjectionThread, i*rowLength, (i+1) * rowLength, i);
 	}
 	for (auto& th : ThreadPool) { th.join(); };
 }
@@ -138,8 +139,13 @@ inline static void ProjectionSinglethreaded() { // inspired by Autopilot in Proj
 	vector<SDL_Vertex> temp;
 	VerticieQueueS.reserve(TriangleQueue.size() * 3); // resize memory for all verticies
 	for (int i = 0; i < TriangleQueue.size(); i++) {
-		temp = DrawTriangle(TriangleQueue[i]);
-		VerticieQueueS.insert(VerticieQueueS.end(), temp.begin(), temp.end());
+		array<SDL_Vertex, 3> verts = DrawTriangle(TriangleQueue[i]);
+		temp.push_back(verts[0]);
+		temp.push_back(verts[1]);
+		temp.push_back(verts[2]);
+		VerticieQueueS.emplace_back(verts[0]);
+		VerticieQueueS.emplace_back(verts[1]);
+		VerticieQueueS.emplace_back(verts[2]);
 	}
 }
 static void renderThread(int yMin, int yMax) {
