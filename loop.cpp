@@ -110,6 +110,9 @@ int game() {
 			std::swap(GameMap, GameMapNext); // Basically GameMap = GameMapNext; but Copilot says it's faster lol
 			if (Debug == true) { TickTime = SDL_GetTicks() - TickTime; }
 		}
+		else {
+			TickTime = 0;
+		}
 		// User Input
 		if (Debug == true) { InputTime = SDL_GetTicks(); }
 		inputHandler();
