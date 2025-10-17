@@ -106,7 +106,7 @@ inline static vector<SDL_Vertex> DrawTriangle(Triangle T) {
 	c = GetDepthDark(T.B.z);
 	Vert[1].color = {T.color.r * c,T.color.g * c,T.color.b * c,T.color.a};
 	c = GetDepthDark(T.C.z);
-	Vert[3].color = {T.color.r * c,T.color.g * c,T.color.b * c,T.color.a};
+	Vert[2].color = {T.color.r * c,T.color.g * c,T.color.b * c,T.color.a};
 	return Vert;
 }
 inline static void ProjectionThread(int Min, int Max, int Thread) { // some Autopilot but I tried to understand it
