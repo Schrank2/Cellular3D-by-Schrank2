@@ -5,8 +5,9 @@ DONE RenderModel() is done multithreaded, and also singlethreaded, which seems r
 DONE smootheres Movement
 # more Settings ig (Movement Speed, Movement "Slipperyness", Shading Curve, etc.)
 DONE fix FPS measurements (check in loop and in 3DRender, probably doubled it)
-
-# Major: Rework Drawtime, so that multithreading is used until the last moment possible, and then make a vector that I just iterate over with RenderGeometry()
+# Add Camera Rotation
+# Fix Thread Pooling
+DONE Major: Rework Drawtime, so that multithreading is used until the last moment possible, and then make a vector that I just iterate over with RenderGeometry()
 
 OPENGL
 # Use OpenGL (and learn how to use it first lol)
