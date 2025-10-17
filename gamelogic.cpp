@@ -54,8 +54,10 @@ void inputHandler() {
 	if (Keyboard.A == true) { C1.vx += 0.1; }
 	if (Keyboard.S == true) { C1.vz -= 0.1; }
 	if (Keyboard.D == true) { C1.vx -= 0.1; }
-	if (Keyboard.SPACE == true) { C1.yaw -= 1.0; }
-	if (Keyboard.LSHIFT == true) { C1.pitch += 1.0; }
+	if (Keyboard.SPACE == true) { C1.vy -= 1.0; }
+	if (Keyboard.LSHIFT == true) { C1.vy += 1.0; }
+	if (Keyboard.C == true) { C1.yaw -= 0.1; }
+	if (Keyboard.V == true) { C1.yaw -= 0.1; }
 	// Moving the Camera according to its velocity
 	C1.x += C1.vx * 0.3;
 	C1.vx *= 0.9;
