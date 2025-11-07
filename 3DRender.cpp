@@ -46,10 +46,16 @@ inline static float ScreenCoordinateX(float x, float z) {
 	int offset = ScreenWidth * 0.5;
 	return  a + offset;
 }
-inline static void RotateCameraOffset(POS3D point) {
-
+inline static POS3D RotateScene(vector<Triangle> TriangleQueue) {
+	int rowLengthVoxel = VoxelQueue.size() / ThreadCountUsed;
+	for (int i = 0; i < ThreadCountUsed; i++) {
+		int yMin = i * rowLengthVoxel;
+		int yMax = (i == ThreadCountUsed - 1) ? GameHeight : (i + 1) * rowLengthVoxel; // the last thread takes the remaining rows
+		// Start the thread to render the voxels
+		ThreadPool[i] = thread(renderThread, yMin, yMax);
+	}
+	for (auto& th : ThreadPool) { th.join(); }; // Wait for the Rectangles to be calculated
 }
-
 inline static float ScreenCoordinateY(float y, float z) {
 	float Depth = 1+z-C1.z; // Adjusting depth for perspective
 	int a = ScreenWidth * (y + C1.y) / Depth;
@@ -166,7 +172,6 @@ void render3D() {
 	SDL_RenderClear(renderer); // Clear the Texture with white color
 	// reading the Voxels
 	readVoxels(GameMap);
-
 	// Rendering Multithreaded
 	if (Debug == true) { RenderRectangleTime = SDL_GetTicks(); }
 	int rowLengthVoxel =  VoxelQueue.size() / ThreadCountUsed;
@@ -178,7 +183,8 @@ void render3D() {
 	}
 	for (auto& th : ThreadPool) { th.join(); }; // Wait for the Rectangles to be calculated
 	if (Debug == true) { RenderRectangleTime = SDL_GetTicks() - RenderRectangleTime; }
-
+	// rotating all the Triangles, so that the Camera is now the "rotation center"
+	RotateScene(TriangleQueue);
 	// Sort the Triangles by Depth
 	if (Debug == true) { DepthSortTime = SDL_GetTicks(); }
 	std::sort(TriangleQueue.begin(), TriangleQueue.end(), [](const Triangle& a, const Triangle& b) {
