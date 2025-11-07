@@ -46,13 +46,16 @@ inline static float ScreenCoordinateX(float x, float z) {
 	int offset = ScreenWidth * 0.5;
 	return  a + offset;
 }
+inline static void rotateThread(int Min, int Max) {
+
+}
 inline static POS3D RotateScene(vector<Triangle> TriangleQueue) {
-	int rowLengthVoxel = VoxelQueue.size() / ThreadCountUsed;
+	int rowLengthTriangle = TriangleQueue.size() / ThreadCountUsed;
 	for (int i = 0; i < ThreadCountUsed; i++) {
-		int yMin = i * rowLengthVoxel;
-		int yMax = (i == ThreadCountUsed - 1) ? GameHeight : (i + 1) * rowLengthVoxel; // the last thread takes the remaining rows
+		int Min = i * rowLengthTriangle;
+		int Max = (i == ThreadCountUsed - 1) ? GameHeight : (i + 1) * rowLengthTriangle; // the last thread takes the remaining rows
 		// Start the thread to render the voxels
-		ThreadPool[i] = thread(renderThread, yMin, yMax);
+		ThreadPool[i] = thread(rotateThread, Min, Max);
 	}
 	for (auto& th : ThreadPool) { th.join(); }; // Wait for the Rectangles to be calculated
 }
