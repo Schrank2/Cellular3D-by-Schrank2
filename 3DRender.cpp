@@ -49,7 +49,7 @@ inline static float ScreenCoordinateX(float x, float z) {
 inline static void rotateThread(int Min, int Max) {
 
 }
-inline static POS3D RotateScene(vector<Triangle> TriangleQueue) {
+inline static vector<Triangle> RotateScene(vector<Triangle> TriangleQueue) {
 	int rowLengthTriangle = TriangleQueue.size() / ThreadCountUsed;
 	for (int i = 0; i < ThreadCountUsed; i++) {
 		int Min = i * rowLengthTriangle;
@@ -58,6 +58,7 @@ inline static POS3D RotateScene(vector<Triangle> TriangleQueue) {
 		ThreadPool[i] = thread(rotateThread, Min, Max);
 	}
 	for (auto& th : ThreadPool) { th.join(); }; // Wait for the Rectangles to be calculated
+	return TriangleQueue;
 }
 inline static float ScreenCoordinateY(float y, float z) {
 	float Depth = 1+z-C1.z; // Adjusting depth for perspective
