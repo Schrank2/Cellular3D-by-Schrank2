@@ -46,8 +46,16 @@ inline static float ScreenCoordinateX(float x, float z) {
 	int offset = ScreenWidth * 0.5;
 	return  a + offset;
 }
-inline static void rotateThread(int Min, int Max) {
+inline static void rotatePoint(POS3D P, Camera C1) {
 
+}
+inline static void rotateThread(int Min, int Max) {
+	for (int i = Min; i < Max; i++) {
+		// Rotate each vertex of the triangle
+		TriangleQueue[i].A = RotatePoint(TriangleQueue[i].A, C1);
+		TriangleQueue[i].B = RotatePoint(TriangleQueue[i].B, C1);
+		TriangleQueue[i].C = RotatePoint(TriangleQueue[i].C, C1);
+	}
 }
 inline static vector<Triangle> RotateScene(vector<Triangle> TriangleQueue) {
 	int rowLengthTriangle = TriangleQueue.size() / ThreadCountUsed;
