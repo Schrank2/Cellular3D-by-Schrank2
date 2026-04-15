@@ -49,25 +49,25 @@ inline static float ScreenCoordinateX(float x, float z) {
 inline static void rotatePoint(POS3D P, Camera C1) {
 
 }
-inline static void rotateThread(int Min, int Max) {
-	for (int i = Min; i < Max; i++) {
-		// Rotate each vertex of the triangle
-		TriangleQueue[i].A = RotatePoint(TriangleQueue[i].A, C1);
-		TriangleQueue[i].B = RotatePoint(TriangleQueue[i].B, C1);
-		TriangleQueue[i].C = RotatePoint(TriangleQueue[i].C, C1);
-	}
-}
-inline static vector<Triangle> RotateScene(vector<Triangle> TriangleQueue) {
-	int rowLengthTriangle = TriangleQueue.size() / ThreadCountUsed;
-	for (int i = 0; i < ThreadCountUsed; i++) {
-		int Min = i * rowLengthTriangle;
-		int Max = (i == ThreadCountUsed - 1) ? GameHeight : (i + 1) * rowLengthTriangle; // the last thread takes the remaining rows
-		// Start the thread to render the voxels
-		ThreadPool[i] = thread(rotateThread, Min, Max);
-	}
-	for (auto& th : ThreadPool) { th.join(); }; // Wait for the Rectangles to be calculated
-	return TriangleQueue;
-}
+//inline static void rotateThread(int Min, int Max) {
+//	for (int i = Min; i < Max; i++) {
+//		// Rotate each vertex of the triangle
+//		TriangleQueue[i].A = RotatePoint(TriangleQueue[i].A, C1);
+//		TriangleQueue[i].B = RotatePoint(TriangleQueue[i].B, C1);
+//		TriangleQueue[i].C = RotatePoint(TriangleQueue[i].C, C1);
+//	}
+//}
+//inline static vector<Triangle> RotateScene(vector<Triangle> TriangleQueue) {
+//	int rowLengthTriangle = TriangleQueue.size() / ThreadCountUsed;
+//	for (int i = 0; i < ThreadCountUsed; i++) {
+//		int Min = i * rowLengthTriangle;
+//		int Max = (i == ThreadCountUsed - 1) ? GameHeight : (i + 1) * rowLengthTriangle; // the last thread takes the remaining rows
+//		// Start the thread to render the voxels
+//		ThreadPool[i] = thread(rotateThread, Min, Max);
+//	}
+//	for (auto& th : ThreadPool) { th.join(); }; // Wait for the Rectangles to be calculated
+//	return TriangleQueue;
+//}
 inline static float ScreenCoordinateY(float y, float z) {
 	float Depth = 1+z-C1.z; // Adjusting depth for perspective
 	int a = ScreenWidth * (y + C1.y) / Depth;
@@ -196,7 +196,7 @@ void render3D() {
 	for (auto& th : ThreadPool) { th.join(); }; // Wait for the Rectangles to be calculated
 	if (Debug == true) { RenderRectangleTime = SDL_GetTicks() - RenderRectangleTime; }
 	// rotating all the Triangles, so that the Camera is now the "rotation center"
-	RotateScene(TriangleQueue);
+	//RotateScene(TriangleQueue);
 	// Sort the Triangles by Depth
 	if (Debug == true) { DepthSortTime = SDL_GetTicks(); }
 	std::sort(TriangleQueue.begin(), TriangleQueue.end(), [](const Triangle& a, const Triangle& b) {
